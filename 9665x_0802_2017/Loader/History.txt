@@ -1,0 +1,181 @@
+I. History
+(+) -> New
+(*) -> Modified
+(@) -> TODO(wait to find out)
+[2014/03/06]
+    (+) 新增 656 DMA 400MHz DDR3L 參數
+
+[2014/02/13]
+    (*) 修正 655 DMA LV0, LV1 的頻率都是一樣 (by configram.exe)
+
+[2013/09/24]
+    (*) Branch MT verA & verB loader
+    From KevinW's request
+    (*) [verA] 
+        (1).
+        麻煩幫忙build A版(300MHz) 和C版(373Mhz) 開啟DRAM 端ODT的loaderMode Register 設定如下 (MR1 和MR2都需要設定)
+        .\LIB\LIB_Src\Reset\configramLZ.c
+        //DRAM_CTRL_REG_CFG(((EMRS2 & 0x7FFFF000)>>12), DRAM_CMD_MRS_EMRS_SHIFT, DRAM_CMD_MRS_EMRS_SHIFT, 0),
+        =>DRAM_CTRL_REG_CFG((((EMRS2|0x200000) & 0x7FFFF000)>>12), DRAM_CMD_MRS_EMRS_SHIFT, DRAM_CMD_MRS_EMRS_SHIFT, 0),
+        =>Rtt_WR = RZQ/4
+        //DRAM_CTRL_REG_CFG(((EMRS & 0x7FFFF000)>>12), DRAM_CMD_MRS_EMRS_SHIFT, DRAM_CMD_MRS_EMRS_SHIFT, 0),
+        =>DRAM_CTRL_REG_CFG((((EMRS|0x40000) & 0x7FFFF000)>>12), DRAM_CMD_MRS_EMRS_SHIFT, DRAM_CMD_MRS_EMRS_SHIFT, 0),
+        =>Rtt_Nom = RZQ/2
+		
+		(2).
+		0x2E	0xb00010B8	[7]	ODTEN_DQ_I_D0			DQ ODT enable.	設為1
+							[6]	ODTEN_DQS_I_D0			DQS ODT enable.	設為1
+		
+		0x6B	0xb00011AC	[7:6]	WR_ODT_MODE_D0[1:0]					設為10(150 ohm)
+										Write DQ ODT mode
+										00: 300 Ohm
+										01: 75 Ohm
+										10: 150 Ohm
+										11: 50 Ohm	
+		
+		0x6C	0xb00011B0	[7:6]	WR_ODT_MODE_DQS0[1:0]				設為10 (150 ohm)
+										Write DQS ODT mode
+									00: 300 Ohm
+									01: 75 Ohm
+									10: 150 Ohm
+									11: 50 Ohm	
+		
+		(3).
+		Ver A的Loader 再加上一各修改
+                         0x4C (0xb0001130)  從0x4 修改成0x5
+
+
+
+		
+
+        
+                
+                        
+[2013/09/09]
+    (*) .\LIB\LIB_Src\Reset\configramFreqParam.c -> changed version to 0909 - 0008
+    	.\MakeCommon\OutputImg.txt
+	.\Project\Model\MakeConfig.txt
+	.\Tools\Bin\Configram.exe
+[2013/07/29]
+    (*) Modify config dram table version to 2013-07-29-0007 
+        because of => 修正 650B/655B, 1024Mb, LV0 這個組合的 ini 會產生不正確的 DMA 頻率 (不包含 650A)
+        
+[2013/07/15]
+    (*) Modify config dram table version to 2013-07-15-0006 
+        because of =>放大tREFT from 0x5AF --> 0xB5D
+    (+) Add display internal loader version at title list ver v1.61
+    (+) 新增Loader document @.\Tools\Doc\DDR verification package subdocument loader version.pdf
+    
+    
+    
+
+[2013/07/02]
+    (+) .\Include\StorageDef.h
+        Add E_OK_TABLE_FOUND             1      ///< Success & NAND table find
+            E_OK_TABLE_NOT_FOUND         2      ///< Success & NAND table not find
+            E_OK                         0      ///< Success for non - NAND internal storage
+    (*) .\LIB\LIB_Src\Driver\StorageFlash\nand_reg.h
+        .\LIB\LIB_Src\Driver\StorageFlash\nand_RS.c
+        .\Project\Model\Src\bl_func.h
+        .\Project\Model\Src\bl_func.c       
+        .\Project\Model\Src\main.h         
+        .\LIB\makefile               => Keep Driver_Sys.a     
+        .\MakeCommon\OutputImg.txt
+        .\Project\Model\Loader650LZ_R.lds
+        .\Project\Model\MakeConfig.txt
+        .\Tools\Bin\Configram.exe [v1.60]
+         
+        
+    (-) .\LIB\LIB_Src\Driver\Makefile
+        移除這幾個沒用到的make
+        mk_650_Nand_Hamming_xD = $(notdir $(shell find -name \'Makefile650NandEccHammingXd\'))
+        mk_650_Nand_Hamming_SDIO1 = $(notdir $(shell find -name \'Makefile650NandEccHammingSdio1\'))
+        mk_650_Nand_Hamming_SDIO2 = $(notdir $(shell find -name \'Makefile650NandEccHammingSdio2\'))
+        mk_650_Nand_RS_xD = $(notdir $(shell find -name \'Makefile650NandEccRSXd\'))
+
+[2013/06/04]
+    (*) Add SD card OCR timeout (2sec)
+    (*) Change SDIO2 pinmux from SDIO2_1 to SDIO2_2
+    
+[2013/05/24]
+    (*) Modify config dram table version to 2013-05-24
+    (*) Add modify MPLL default bandgap configuration
+    (*) Tool add if encounter config dram version before 2013-05-24 version => high light not modify bandgap configuration
+    (*) Tool version v1.59
+
+
+[2013/05/16]
+    (*) version control
+        .\LIB\LIB_Src\Reset\configramFreqParam.c => Loader DramScript version進版2013-05-16-00004
+
+    (*) ConfigDram Tool 修改不要使用IDE2 palette (0x58/0x5C)-1.57版, 改使用0xB0800500
+        .\LIB\LIB_Src\Reset\reset.S
+
+    (+) PLL bandgap configuration at dram config script 0x58, 0x5C
+        //0xB002_1108 = 0x04
+        //0xB002_1114 = 0x38
+        //0xB002_111C = 0xF7
+[2013/01/10]
+    (+) 新增Calibration & log enable or not flow
+
+[2013/01/06]
+    (*) .\MakeCommon\OutputImg.txt => LD_DOREMAP_ADDR = ($(FW_MAX_CODE_SIZE)|0xA0000000) + 0x200 extend to 0x230
+        because of configdram table extend 0x200 to 0x230
+        => 新增0x20長度當ddr change clock 參數, main code 從原本0x200開始改到0x230
+
+    (*) 依據DTE建議, 把
+        1. phy[0x14] RGL_LDO3[3..0] 從0x2(2.26V) 改成0x1(2.45V)
+        2. phy[0x4B] REG_VREF[6..5] 從0x1(1.5V)換成0x3(1.7V)
+
+    (-) 把DMA 333 & 360 從code base移除 (包括MakeConfig.txt選項 & ini檔案)暫不開放出去
+
+    (*) .\Tools\Bin\Configram.exe
+        .\Project\Model\Src\bl_func.c
+        .\Project\Model\Src\bl_func.h
+
+
+[2012/12/25]
+    (+) .\LIB\LIB_Src\Reset\reset.S add record Romcode calibration result sram address => CalibrationDutyReg
+        .\LIB\LIB_Src\Reset\configram.h add definition of duty calibration script
+        .\MakeCommon\MakeOption.txt add configDram.exe path
+        .\MakeCommon\OutputImg.txt
+
+    (*) .\LIB\LIB_Src\Reset\configramLZ.c latest parameter of ddr phy related param
+[2012/05/31]
+    (*) Remove un - necessory code
+        .\LIB\LIB_Src\Core\mips24KE\Cache.c
+        .\LIB\LIB_Src\Core\mips24KE\Cache.h
+        .\LIB\LIB_Src\Core\mips24KE\cpu_s.S
+        .\Project\Model\Src\bl_func.c
+
+[2010/08/17]
+	(+) 解決ASE DSP instruction問題, 使用前必須開Status Register field bit[24] MX
+		bit, 就可以使用.
+		Sample code
+		void enable_ASE(void)
+		{
+		    __asm__("mfc0   $10, $12");
+		    __asm__("li     $11, 0x01000000");
+		    __asm__("not    $11");
+		    __asm__("and    $10, $11");
+		    __asm__("or     $10, 0x01000000");
+		    __asm__("mtc0   $10, $12");
+		}
+		Audio要評估ASE DSP instruction效能是否有加強.
+
+	(+) Cache會在embeded rom code step就開啟. 但因為Embeded Rom是跑在0xBFC00000,因此一定為non cache operation
+		但可以initial cache, 讓loader不需要再開cache. 目前cache有code可以init! 且因為我們code是跑在kseg0(0x80000000開始)
+		是不需要使用TLB做address轉換.(TLB轉換也有sample code)
+
+	(+) 目前可以用最新的Code sourcery 4.4版build 出HL當時的dram test code, 在FPGA上run.
+
+[2010/08/03]
+	(*) 解決exceed 64K issue add -G 0 : 目前可以build binary file
+
+[2010/07/28]
+	(*) -mapcs 只有在arm才有
+	(*) compiling 少了-c
+
+[2010/07/27]
+	(@) Isolate make 有問題(待查)
+	(@) Make library尚未try

@@ -1,0 +1,56 @@
+LintRule 2011.02.09
+1.更新options.LNT, 如果使用BinaryFormat.h允許的macro,則572可以忽略
+
+LintRule 2011.01.26
+1.更新options.LNT, 把613,940,960關閉
+
+LintRule 2011.01.25
+1.更新options.LNT, 把522關閉
+
+LintRule 2011.01.21
+1.更新options.LNT, 加上__LINT__ marcro, 可以讓code識別是否為under PCLINT的case
+
+LintRule 2011.01.20
+1.更新options.LNT, 把[W2](warning level 2)關閉, 只先開[常觸犯的W2]
+
+LintRule 2011.01.19
+1.更新options.LNT, 修正因為PCLint不認得va_start(), va_arg()所造成的error, 用define方式避掉
+
+LintRule 2011.01.14
+1.更新options.LNT, 修正warning level/pass的設定
+
+LintRule 2011.01.12
+1.更新options.LNT, 調整misra跟warning level/pass的設定順序
+2.更新options.LNT, 修正因為PCLint不認得va_start(), va_arg()所造成的error, 用define方式避掉
+3.更新options.LNT, 修正因為PCLint不認得__asm, nop所造成的error, 用define方式避掉
+  (PS: 請抓這一版Label: Jeah - 2011/1/12 - 3)
+
+LintRule 2011.01.11
+1.更新options.LNT, 把std.LNT裡面的Lib path設定移到這邊, options.LNT定位為[共通設定檔]
+2.更新MakeCommon, 新增可以個別設定不同Code Layer的[擴充設定檔], 包含
+options_Driver.LNT, options_Lib.LNT, options_LibExt.LNT, options_App.LNT, options_AppExt.LNT, options_Prj.LNT
+  (PS: 請抓這一版Label: Jeah - 2011/1/11 - 4)
+
+LintRule 2011.01.10
+1.更新options.LNT, 關閉505 Msg, 很多UI Resource Data檔會觸犯這條, 此warning量多先關掉
+2.更新options.LNT, 關閉534 Msg, 此warning量多先關掉
+3.更新options.LNT, 關閉537 Msg, 此warning量多先關掉
+4.更新options.LNT, 關閉830 & 831 Msg, (輔助前一個Warning的額外行數資訊), 此note無用先關掉
+5.更新MakeCommon, 改用module做為單位再做綜合分析, 可減少下列552, 526兩種Msg的誤報 
+  每個C檔處理過程, 會輸出LOB暫存檔, 等做完Module的Cross-Relation之後就自動刪除
+6.把LNT設定檔改為放在/MakeCommon/LintRule裡面, 可跟VSS一起check in
+  (PS: 請抓這一版Label: Jeah - 2011/1/10 - 9)
+
+LintRule 2011.01.05
+1.更新std.LNT, 修正ADS include path的設定語法, 避免PCLint search到不正確的path
+2.更新CO-ADS.LNT, 修正PCLint output msg format for source insight整合
+3.更新options.LNT, 關閉misra 2004 rules
+4.更新options.LNT, 把warning level設定為2, pass設定為1
+5.更新options.LNT, 忽略ADS include檔的msg
+6.更新options.LNT, 忽略driver include檔的msg
+7.更新options.LNT, 修正因為PCLint不認得__align()所造成的大量error
+8.更新MakeCommon & makefile, 把make config 所指定的custom define值正確傳給PCLint, 避免define錯誤所造成的大量error
+  (PS: 請抓這一版Label: Jeah - 2011/1/5 - 1)
+
+LintRule 2011.01.04
+1.第一版

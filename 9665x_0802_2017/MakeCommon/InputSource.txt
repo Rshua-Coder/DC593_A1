@@ -1,0 +1,119 @@
+#----------------------------------------------------------------------
+# get the source full path, convert upper case extension to lower case
+#----------------------------------------------------------------------
+SRC := $(addprefix $(shell cygpath --mixed $(shell pwd))/, $(SRC:.C=.c))
+ASM := $(addprefix $(shell cygpath --mixed $(shell pwd))/, $(ASM:.S=.s))
+
+#----------------------------------------------------------------------
+# set the basic include directories
+#----------------------------------------------------------------------
+# Get working directory
+MYPWD       := $(shell pwd)
+APP_PATH    := $(findstring /App/, $(MYPWD))
+APPEXT_PATH := $(findstring /AppExt/, $(MYPWD))
+LIB_PATH    := $(findstring /Lib/, $(MYPWD))
+LIBEXT_PATH := $(findstring /LibExt/, $(MYPWD))
+DRV_PATH    := $(findstring /Drv/, $(MYPWD))
+DRVEXT_PATH := $(findstring /DrvExt/, $(MYPWD))
+COM_PATH    := $(findstring /Common/, $(MYPWD))
+PRJ_PATH    := $(shell find ./ -maxdepth 1 -name MakeConfig.txt)
+
+BASE_INC_DIR    := $(filter %../../Include, $(INC_DIR))
+APPEXT_INC_DIR  := -I$(BASE_INC_DIR)/AppExt
+APP_INC_DIR     := -I$(BASE_INC_DIR)/App
+LIBEXT_INC_DIR  := -I$(BASE_INC_DIR)/LibExt
+LIB_INC_DIR     := -I$(BASE_INC_DIR)/Lib
+DRVEXT_INC_DIR  := -I$(BASE_INC_DIR)/DrvExt
+DRV_INC_DIR     := -I$(BASE_INC_DIR)/Drv
+LIBC_INC_DIR    := -I$(BASE_INC_DIR)/Common/LibC
+
+ifeq "$(USE_ECOS_KERNEL)" "ON"
+#eCos include path like ThirdParty/eCos/Include ThirdParty/live555/Include
+RTK_WIFI_INC_DIR := -I$(BASE_INC_DIR)/../ThirdParty/devs_eCos-rtl
+ECOS_INC_DIR_TMP :=  $(addprefix -I,$(addsuffix /Include, $(shell find $(BASE_INC_DIR)/../ThirdParty/ -maxdepth 1 -mindepth 1 -type d)))
+# Whole eCos include and filter out *.rtk's wifi driver include path
+ECOS_INC_WO_RTK_DRV := $(filter-out $(RTK_WIFI_INC_DIR)%, $(ECOS_INC_DIR_TMP))
+ECOS_INC_DIR = -I$(BASE_INC_DIR)/../ThirdParty/devs_eCos-rtl$(WIFIMDL)es/include
+ECOS_INC_DIR += $(ECOS_INC_WO_RTK_DRV)
+endif
+
+# INC_DIR are all header file's path
+INC_DIR := $(addprefix -I, $(sort $(dir $(shell find $(INC_DIR) -name \'\*\.h\'))))
+
+# For uITRON (MIPS) platform, we use proprietary standard C library.
+# We must filter out proprietary header file if we are in others platform (ARM or eCos...)
+# Filter out standard C library header file
+ifeq "$(ARCH)" "ARM"
+    INC_DIR := $(filter-out $(LIBC_INC_DIR)/%, $(INC_DIR))
+endif
+
+ifeq "$(USE_ECOS_KERNEL)" "ON"
+    INC_DIR := $(filter-out $(LIBC_INC_DIR)/%, $(INC_DIR))
+    INC_DIR += $(ECOS_INC_DIR)
+endif
+
+ifeq "$(INCLUDE_RULE)" "ON"
+
+#----------------------------------------------------------------------
+# Filter out upper layer's include path
+#----------------------------------------------------------------------
+
+# /Drv can't access /App or /AppExt or /Lib or /LibExt
+ifneq "$(DRV_PATH)" ""
+INC_DIR := $(filter-out $(APPEXT_INC_DIR)% $(APP_INC_DIR)% $(LIBEXT_INC_DIR)% $(LIB_INC_DIR)%, $(INC_DIR))
+endif
+
+# /DrvExt can't access /App or /AppExt or /Lib or /LibExt
+ifneq "$(DRVEXT_PATH)" ""
+INC_DIR := $(filter-out $(APPEXT_INC_DIR)% $(APP_INC_DIR)% $(LIBEXT_INC_DIR)% $(LIB_INC_DIR)%, $(INC_DIR))
+endif
+
+# /Lib can't access /App or /AppExt
+ifneq "$(LIB_PATH)" ""
+INC_DIR := $(filter-out $(APPEXT_INC_DIR)% $(APP_INC_DIR)%, $(INC_DIR))
+endif
+
+# /LibExt can't access /App or /AppExt
+ifneq "$(LIBEXT_PATH)" ""
+INC_DIR := $(filter-out $(APPEXT_INC_DIR)% $(APP_INC_DIR)%, $(INC_DIR))
+endif
+
+#----------------------------------------------------------------------
+# Filter out under layer's include path
+#----------------------------------------------------------------------
+
+# /App can't access /Drv or /DrvExt
+#ifneq "$(APP_PATH)" ""
+#INC_DIR := $(filter-out $(DRVEXT_INC_DIR)% $(DRV_INC_DIR)%, $(INC_DIR))
+#endif
+
+# /AppExt can't access /Drv or /DrvExt
+#ifneq "$(APPEXT_PATH)" ""
+#INC_DIR := $(filter-out $(DRVEXT_INC_DIR)% $(DRV_INC_DIR)%, $(INC_DIR))
+#endif
+
+# /Prj can't access /Drv or /DrvExt
+#ifneq "$(PRJ_PATH)" ""
+#INC_DIR := $(filter-out $(DRVEXT_INC_DIR)% $(DRV_INC_DIR)%, $(INC_DIR))
+#endif
+
+#----------------------------------------------------------------------
+# Filter out external layer's include path
+#----------------------------------------------------------------------
+
+# /Drv can't access /DrvExt
+#ifneq "$(DRV_PATH)" ""
+#INC_DIR := $(filter-out $(DRVEXT_INC_DIR)%, $(INC_DIR))
+#endif
+
+# /Lib can't access /LibExt
+#ifneq "$(LIB_PATH)" ""
+#INC_DIR := $(filter-out $(LIBEXT_INC_DIR)%, $(INC_DIR))
+#endif
+
+# /App can't access /AppExt
+#ifneq "$(APP_PATH)" ""
+#INC_DIR := $(filter-out $(APPEXT_INC_DIR)%, $(INC_DIR))
+#endif
+
+endif

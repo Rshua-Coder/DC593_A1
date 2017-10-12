@@ -1,0 +1,177 @@
+<HTML>
+<HEAD>
+<Title>test</Title>
+</HEAD>
+<BODY>
+Change Mode
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=3001&par=0">capture</option>
+<option value="?custom=1&cmd=3001&par=1" selected="true">movie</option>
+<option value="?custom=1&cmd=3001&par=2">playback</option>
+</select>
+<br>Capture Size
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=1002&par=0" selected="true">SIZE_12M</option>
+<option value="?custom=1&cmd=1002&par=1">SIZE_10M</option>
+<option value="?custom=1&cmd=1002&par=5">SIZE_2M169</option>
+</select>
+<A HREF ="?custom=1&cmd=1001">Start Capture</A>
+<A HREF ="?custom=1&cmd=1003">Free Picture Number</A>
+<A HREF ="?custom=1&cmd=2016">Movie Record Recording Time</A>
+<br>Record
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2001&par=1">Start Record</option>
+<option value="?custom=1&cmd=2001&par=0" selected="true">Stop Record</option>
+</select>
+<br>
+<A HREF ="?custom=1&cmd=2017">Take a picture while recording</A>
+<br>
+<A HREF ="?custom=1&cmd=2018">Get RAW Encode JPG</A>
+<br>
+<A HREF ="?custom=1&cmd=2009">Max Recording Time</A>
+<br>Movie Recording Size
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2002&par=0" selected="true">1080P_FULLRES</option>
+<option value="?custom=1&cmd=2002&par=1">720P</option>
+<option value="?custom=1&cmd=2002&par=2">WVGA</option>
+<option value="?custom=1&cmd=2002&par=3">VGA</option>
+</select>
+<br>Movie APP Preview Size
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2010&par=0">720P</option>
+<option value="?custom=1&cmd=2010&par=1">WVGA</option>
+<option value="?custom=1&cmd=2010&par=2">640x480</option>
+<option value="?custom=1&cmd=2010&par=3" selected="true">640x360</option>
+<option value="?custom=1&cmd=2010&par=4">QVGA</option>
+</select>
+<br>Cyclic Rec
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2003&par=0" selected="true">off</option>
+<option value="?custom=1&cmd=2003&par=1">3Min</option>
+<option value="?custom=1&cmd=2003&par=2">5Min</option>
+<option value="?custom=1&cmd=2003&par=3">10Min</option>
+</select>
+<br>MovieHDR
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2004&par=0" selected="true">off</option>
+<option value="?custom=1&cmd=2004&par=1">On</option>
+</select>
+<br>MovieEV
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2005&par=6" selected="true">00</option>
+<option value="?custom=1&cmd=2005&par=0">+20</option>
+<option value="?custom=1&cmd=2005&par=1">+16</option>
+<option value="?custom=1&cmd=2005&par=2">+13</option>
+<option value="?custom=1&cmd=2005&par=3">+10</option>
+<option value="?custom=1&cmd=2005&par=4">+06</option>
+<option value="?custom=1&cmd=2005&par=5">+03</option>
+<option value="?custom=1&cmd=2005&par=6">00</option>
+<option value="?custom=1&cmd=2005&par=7">-03</option>
+<option value="?custom=1&cmd=2005&par=8">-06</option>
+<option value="?custom=1&cmd=2005&par=9">-10</option>
+<option value="?custom=1&cmd=2005&par=10">-13</option>
+<option value="?custom=1&cmd=2005&par=11">-16</option>
+<option value="?custom=1&cmd=2005&par=12">-20</option>
+</select>
+<br>MotionDet
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2006&par=0" selected="true">off</option>
+<option value="?custom=1&cmd=2006&par=1">On</option>
+</select>
+<br>MovieAudio
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2007&par=0" selected="true">off</option>
+<option value="?custom=1&cmd=2007&par=1">On</option>
+</select>
+<br>MovieGSensorSensitivity
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2011&par=0" selected="true">off</option>
+<option value="?custom=1&cmd=2011&par=1">Low</option>
+<option value="?custom=1&cmd=2011&par=2">Med</option>
+<option value="?custom=1&cmd=2011&par=3">High</option>
+</select>
+<br>DateImprint
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2008&par=0" selected="true">off</option>
+<option value="?custom=1&cmd=2008&par=1">On</option>
+</select>
+<br>AutoRecording
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=2012&par=0" selected="true">off</option>
+<option value="?custom=1&cmd=2012&par=1">On</option>
+</select>
+<br>Poweroff
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=3007&par=0" selected="true">off</option>
+<option value="?custom=1&cmd=3007&par=1">3Min</option>
+<option value="?custom=1&cmd=3007&par=2">5Min</option>
+<option value="?custom=1&cmd=3007&par=3">10Min</option>
+</select>
+<br>Language
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=3008&par=0" selected="true">English</option>
+<option value="?custom=1&cmd=3008&par=1">French</option>
+<option value="?custom=1&cmd=3008&par=2">Spanish</option>
+<option value="?custom=1&cmd=3008&par=3">Portuguese</option>
+<option value="?custom=1&cmd=3008&par=4">German</option>
+<option value="?custom=1&cmd=3008&par=5">Italian</option>
+<option value="?custom=1&cmd=3008&par=6">Simplified Chinese</option>
+<option value="?custom=1&cmd=3008&par=7">Traditional Chinese</option>
+<option value="?custom=1&cmd=3008&par=8">Russian</option>
+<option value="?custom=1&cmd=3008&par=9">Japanese</option>
+</select>
+<br>TV
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=3009&par=0" selected="true">NTSC</option>
+<option value="?custom=1&cmd=3009&par=1">PAL</option>
+</select>
+<br>Format
+<select onchange="window.open(this.options[this.selectedIndex].value)">
+<option value="?custom=1&cmd=3010&par=0" selected="true">Nand</option>
+<option value="?custom=1&cmd=3010&par=1">SD Card</option>
+</select>
+<A HREF ="?custom=1&cmd=3011">SysReset</A>
+<br><A HREF ="?custom=1&cmd=3012">Version</A>
+<br><A HREF ="?custom=1&cmd=3013">FWUpdate</A>
+<br><A HREF ="?custom=1&cmd=3014">QueryAllCmdStatus</A>
+<br><A HREF ="?custom=1&cmd=3015">FileList</A>
+<br><A HREF ="?custom=1&cmd=3016">HeartBeat</A>
+<br><A HREF ="?custom=1&cmd=3017">DiskFreeSpace</A>
+<br><A HREF ="?custom=1&cmd=3003&str=ABCDE">SSID</A>
+<br><A HREF ="?custom=1&cmd=3004&str=87654321">PASSPHRASE</A>
+<br><A HREF ="?custom=1&cmd=3005&str=2014-03-21">SetupDate</A>
+<br><A HREF ="?custom=1&cmd=3006&str=17:10:30">SetupTime</A>
+<br><A HREF ="?custom=1&cmd=3018">ReConnect</A>
+<br><A HREF ="?custom=1&cmd=3019">Battery</A>
+<br><A HREF ="?custom=1&cmd=3021">Save Menu</A>
+<br><A HREF ="?custom=1&cmd=3022">Get HW Capability</A>
+<br><A HREF ="?custom=1&cmd=3023">Remove Last Connect</A>
+<br><A HREF ="?custom=1&cmd=3024">Card Status</A>
+<br><A HREF ="?custom=1&cmd=3025">Download URL</A>
+<br><A HREF ="?custom=1&cmd=3026">UpdateFW Name</A>
+
+<br><A HREF ="?custom=1&cmd=3028&par=0">Set PIP Style-Path 1 fully on Top</A>
+<br><A HREF ="?custom=1&cmd=3028&par=2">Set PIP Style-1T1S2B</A>
+<br><A HREF ="?custom=1&cmd=3028&par=3">Set PIP Style-Path 2 fully on Top</A>
+<br><A HREF ="?custom=1&cmd=3028&par=4">Set PIP Style-2T1B2S</A>
+<br>
+<br><A HREF ="?custom=1&cmd=3029">Get SSID and passphrase</A>
+<br>
+<br><A HREF ="?custom=1&cmd=2001&par=1">Start Movie Record</A>
+<br><A HREF ="?custom=1&cmd=2001&par=0">Stop Movie Record</A>
+<br>
+<br><A HREF ="?custom=1&cmd=2013&str=1450">Set Current Movie Record BitRate:1450KBytes</A>
+<br><A HREF ="?custom=1&cmd=2013&str=800">Set Current Movie Record BitRate:800KBytes</A>
+<br><A HREF ="?custom=1&cmd=2013&str=400">Set Current Movie Record BitRate:400KBytes</A>
+<br>
+<br><A HREF ="?custom=1&cmd=2014&str=800">Set Current Movie Preview BitRate:800KBytes</A>
+<br><A HREF ="?custom=1&cmd=2014&str=400">Set Current Movie Preview BitRate:400KBytes</A>
+<br><A HREF ="?custom=1&cmd=2014&str=300">Set Current Movie Preview BitRate:300KBytes</A>
+<br>
+<br><A HREF ="?custom=1&cmd=2015&par=1">Start Movie Preview</A>
+<br><A HREF ="?custom=1&cmd=2015&par=0">Stop Movie Preview</A>
+<br><A HREF ="?custom=1&cmd=3030&par=0">Query Movie Size</A>
+<br><A HREF ="?custom=1&cmd=3031&str=A1B2C3D4">Query Menu</A>
+<br><A HREF ="?custom=1&cmd=3031&par=A1B2C3D4">Query Menu ERR</A>
+</BODY>
+</HTML>

@@ -1,0 +1,1165 @@
+
+#----------------------------------------------------------------------
+# Set model here
+#----------------------------------------------------------------------
+#MODEL select in ModelConfig.txt
+
+
+#----------------------------------------------------------------------
+# set chip version here
+#----------------------------------------------------------------------
+#ifeq "$(ARCH)" "ARM"
+#CHIP = 460
+#endif
+
+#ifeq "$(ARCH)" "MIPS"
+#CHIP = 655
+#endif
+
+#----------------------------------------------------------------------
+# set binary file name
+#----------------------------------------------------------------------
+#BIN_NAME = FW96450A
+
+#----------------------------------------------------------------------
+# multi regions in scatter description file or not
+# ON: Two or more load regions
+# OFF: Only one load region
+#----------------------------------------------------------------------
+ifeq "$(ARCH)" "ARM"
+MULTI_REGIONS = ON
+endif
+
+ifeq "$(ARCH)" "MIPS"
+MULTI_REGIONS = OFF
+endif
+
+#----------------------------------------------------------------------
+# pass bin name to c code
+#----------------------------------------------------------------------
+BIN_NAME_PARAM = \
+	-D_BIN_NAME_='"$(BIN_NAME)"' \
+	-D_BIN_NAME_T_='"$(BIN_NAME_T)"' \
+	-D_BIN_NAME_F_='"$(BIN_NAME_F)"' \
+
+#----------------------------------------------------------------------
+# set encrypt binary parameters
+# EBIN_METHOD
+#   CRC: CRC32
+#   SUM: Checksum
+# EBIN_BADDR
+#   Model name address in binary file (VersionInfo.s), should be 0x50
+# EBIN_MNAME
+#   Model name store in binary file (VersionInfo.s)
+# EBIN_PSTR
+#   Optional parameter, use as additional bytes to generate CRC or checksum
+#----------------------------------------------------------------------
+#EBIN_METHOD = CRC
+EBIN_METHOD = SUM
+
+EBIN_BADDR  = 0x50
+EBIN_MNAME  = NT96$(CHIP)
+EBIN_PSTR   =
+
+#----------------------------------------------------------------------
+# UI style config
+#----------------------------------------------------------------------
+
+UI_STYLE_PARAM = \
+	-DUI_STYLE_DEMO=0 \
+	-DUI_STYLE_TURNKEY=0 \
+	-DUI_STYLE_DRIVER=1 \
+	-DUI_STYLE=$(UI_STYLE)
+
+UPDATE_CFG_PARAM = \
+	-DUPDATE_CFG_NO=1 \
+	-DUPDATE_CFG_YES=2 \
+	-DUPDATE_CFG=$(UPDATE_CFG)
+DISPLAY_169HD_PARAM = \
+	-DDISPLAY_169HD_NO=0 \
+	-DDISPLAY_169HD_YES=1 \
+	-DDISPLAY_169HD=$(DISPLAY_169HD)
+
+TV_DISPLAY_169HD_PARAM = \
+	-DTV_DISPLAY_169HD_NO=0 \
+	-DTV_DISPLAY_169HD_YES=1 \
+	-DTV_DISPLAY_169HD=$(TV_DISPLAY_169HD)
+
+PIP_VIEW_PARAM = \
+	-DPIP_VIEW_DISABLE=0 \
+	-DPIP_VIEW_ENABLE=1 \
+	-DPIP_VIEW_FUNC=$(PIP_VIEW)
+
+MULTI_REC_PARAM = \
+	-DMULTI_REC_DISABLE=0 \
+	-DMULTI_REC_ENABLE=1 \
+	-D_MULTI_RECORD_FUNC_=$(MULTI_REC)
+
+SENSOR2_720P_PARAM = \
+	-DSENSOR2_720P_DISABLE=0 \
+	-DSENSOR2_720P_ENABLE=1 \
+	-D_SENSOR2_720P_=$(SENSOR2_720P)
+
+#----------------------------------------------------------------------
+# set parameters due to external device selection
+# user doesn't need to modify this area unless adding/deleting devices
+# note: the parameter name must be the same as source code
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Chip parameters
+#----------------------------------------------------------------------
+ifeq "$(CHIP)" "460"
+  CHIP_TYPE = _CHIP_460_
+endif
+
+ifeq "$(CHIP)" "650"
+  CHIP_TYPE = _CHIP_650_
+endif
+
+ifeq "$(CHIP)" "655"
+  CHIP_TYPE = _CHIP_655_
+endif
+
+ifeq "$(CHIP)" "658"
+  CHIP_TYPE = _CHIP_658_
+endif
+
+CHIP_PARAM = \
+    -D_CHIP_460_=0 \
+    -D_CHIP_650_=1 \
+    -D_CHIP_655_=2 \
+    -D_CHIP_658_=3 \
+    -D_CHIP_=$(CHIP_TYPE)
+
+ifeq "$(ARCH)" "ARM"
+CHIP_PARAM_ASM = \
+    -PD "_CHIP_460_ SETA 0" \
+    -PD "_CHIP_650_ SETA 1" \
+    -PD "_CHIP_655_ SETA 2" \
+    -PD "_CHIP_658_ SETA 3" \
+    -PD "_CHIP_ SETA $(CHIP_TYPE)"
+endif
+
+
+#----------------------------------------------------------------------
+# LCD parameters
+#----------------------------------------------------------------------
+ifeq "$(LCD)" "OFF"
+  LCD_TYPE = _LCDTYPE_OFF_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_AUCN01"
+  LCD_TYPE = _LCDTYPE_AUCN01_
+endif
+
+ifeq "$(LCD)" "Disp_IFDSI_LCD1_ILI9163C"
+  LCD_TYPE = _LCDTYPE_ILI9163C_DSI_
+endif
+
+ifeq "$(LCD)" "Disp_IFDSI_LCD1_HX8369B"
+  LCD_TYPE = _LCDTYPE_HX8369B_DSI_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_RZWT15P00"
+    LCD_TYPE = _LCDTYPE_RZWT15P00_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_RZWT27P02"
+    LCD_TYPE = _LCDTYPE_RZWT27P02_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_TXDT270C_8961_6A6"
+    LCD_TYPE = _LCDTYPE_TXDT270C_8961_6A6_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_TXDT270C_8961_6A6_Flip"
+    LCD_TYPE = _LCDTYPE_TXDT270C_8961_6A6_Flip_
+endif
+
+ifeq "$(LCD)" "Disp_IFPA_LCD1_A030VN01"
+  LCD_TYPE = _LCDTYPE_A030VN01_
+endif
+
+ifeq "$(LCD)" "Disp_IFMI_LCD1_ILI9341"
+  LCD_TYPE = _LCDTYPE_ILI9341_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_ILI9342C"
+    LCD_TYPE = _LCDTYPE_ILI9342C_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_T43P49_OTA5180A"
+  LCD_TYPE = _LCDTYPE_T43P49_OTA5180A_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_DX430N_OTA5180A"
+  LCD_TYPE = _LCDTYPE_DX430N_OTA5180A_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_PW35P00_HX8238D"
+  LCD_TYPE = _LCDTYPE_PW35P00_HX8238D_
+endif
+
+ifeq "$(LCD)" "Disp_IFDSI_LCD1_UT35067A0_ILI9488"
+  LCD_TYPE = _LCDTYPE_UT35067A0_ILI9488_DSI_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_PW27P05_ILI8961"
+  LCD_TYPE = _LCDTYPE_PW27P05_ILI8961_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_WIFI_DUMMY"
+  LCD_TYPE = _LCDTYPE_WIFI_DUMMY_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_COMBO"
+  LCD_TYPE = _LCDTYPE_COMBO_
+endif
+
+ifeq "$(LCD)" "Disp_IF8B_LCD1_OTA5182A"
+    LCD_TYPE = _LCDTYPE_OTA5182A_
+endif
+
+LCD_PARAM = \
+    -D_LCDTYPE_OFF_=0 \
+    -D_LCDTYPE_AUCN01_=1 \
+    -D_LCDTYPE_ILI9163C_DSI_=2 \
+    -D_LCDTYPE_RZWT15P00_=3 \
+    -D_LCDTYPE_RZWT27P02_=4 \
+    -D_LCDTYPE_TXDT270C_8961_6A6_=5 \
+    -D_LCDTYPE_TXDT270C_8961_6A6_Flip_=6 \
+    -D_LCDTYPE_A030VN01_=7 \
+    -D_LCDTYPE_ILI9341_=8 \
+    -D_LCDTYPE_T43P49_OTA5180A_=9 \
+    -D_LCDTYPE_HX8369B_DSI_=10 \
+    -D_LCDTYPE_PW35P00_HX8238D_=11 \
+    -D_LCDTYPE_UT35067A0_ILI9488_DSI_=12 \
+    -D_LCDTYPE_ILI9342C_=13 \
+    -D_LCDTYPE_PW27P05_ILI8961_=17 \
+    -D_LCDTYPE_DX430N_OTA5180A_=18 \
+    -D_LCDTYPE_WIFI_DUMMY_=19 \
+    -D_LCDTYPE_COMBO_=20 \
+    -D_LCDTYPE_OTA5182A_=21\
+    -D_LCDTYPE_=$(LCD_TYPE)
+
+#----------------------------------------------------------------------
+# LCD2 parameters
+#----------------------------------------------------------------------
+ifeq "$(LCD2)" "OFF"
+  LCD2_TYPE = _LCDTYPE_OFF_
+endif
+
+ifeq "$(LCD2)" "Disp_IF8B_LCD2_AUCN01"
+  LCD2_TYPE = _LCDTYPE_AUCN01_
+endif
+
+LCD2_PARAM = \
+    -D_LCDTYPE_OFF_=0 \
+    -D_LCDTYPE_AUCN01_=1 \
+    -D_LCD2TYPE_=$(LCD2_TYPE)
+
+#----------------------------------------------------------------------
+# TV parameters
+#----------------------------------------------------------------------
+ifeq "$(TV)" "OFF"
+  TV_TYPE = _TV_OFF_
+endif
+
+ifeq "$(TV)" "ON"
+  TV_TYPE = _TV_ON_
+endif
+
+TV_PARAM = \
+    -D_TV_OFF_=0 \
+    -D_TV_ON_=1 \
+    -D_TVTYPE_=$(TV_TYPE)
+
+#----------------------------------------------------------------------
+# HDMI parameters
+#----------------------------------------------------------------------
+ifeq "$(HDMI)" "OFF"
+  HDMI_TYPE = _HDMI_OFF_
+endif
+
+ifeq "$(HDMI)" "ON"
+  HDMI_TYPE = _HDMI_ON_
+endif
+
+HDMI_PARAM = \
+    -D_HDMI_OFF_=0 \
+    -D_HDMI_ON_=1 \
+    -D_HDMITYPE_=$(HDMI_TYPE)
+
+#----------------------------------------------------------------------
+# Sensor parameters
+#----------------------------------------------------------------------
+ifeq "$(SENSOR)" "Sensor_Panasonic10M_433"
+  SENSOR_TYPE = _SENSORLIB_PANA10M_433_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Panasonic10M_ADDI9000_433"
+  SENSOR_TYPE = _SENSORLIB_PANA10M_ADDI9000_433_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Sony12M_ADDI9000_433"
+  SENSOR_TYPE = _SENSORLIB_SONY12M_ADDI9000_433_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Panasonic10M_ADDI9000_433_J1050"
+  SENSOR_TYPE = _SENSORLIB_PANA10M_ADDI9000_433_J1050_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Panasonic10M_ADDI9004_433"
+  SENSOR_TYPE = _SENSORLIB_PANA10M_ADDI9004_433_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Sony12M_ADDI9000_433_J1250"
+  SENSOR_TYPE = _SENSORLIB_SONY12M_ADDI9000_433_J1250_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Panasonic14M_450"
+  SENSOR_TYPE = _SENSORLIB_PANA14M_450_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Sony14M_ADDI9004_433"
+  SENSOR_TYPE = _SENSORLIB_SONY14M_ADDI9004_433_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Sony14M_ADDI9004_450"
+  SENSOR_TYPE = _SENSORLIB_SONY14M_ADDI9004_450_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Panasonic10M_VSP6244A_433"
+  SENSOR_TYPE = _SENSORLIB_PANA10M_VSP6244A_433_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Panasonic12M_ADDI9004_433"
+  SENSOR_TYPE = _SENSORLIB_PANA12M_ADDI9004_433_
+endif
+
+ifeq "$(SENSOR)" "Sensor_Panasonic10M_450"
+  SENSOR_TYPE = _SENSORLIB_PANA10M_450_
+endif
+
+ifeq "$(SENSOR)" "Sensor_ICX631_VSP6244B_Mars3"
+  SENSOR_TYPE = _SENSORLIB_ICX631_VSP6244B_Mars3_
+endif
+
+ifeq "$(SENSOR)" "Sensor_ICX631_VSP6244B_Sivaco"
+  SENSOR_TYPE = _SENSORLIB_ICX631_VSP6244B_Sivaco_
+endif
+
+ifeq "$(SENSOR)" "Sensor_RJ23Y3BC4LT_VSP6244A_Hera"
+  SENSOR_TYPE = _SENSORLIB_RJ23Y3BC4LT_VSP6244A_Hera_
+endif
+
+ifeq "$(SENSOR)" "Sensor_RJ23Y3BC4LT_VSP6244A_Ares"
+  SENSOR_TYPE = _SENSORLIB_RJ23Y3BC4LT_VSP6244A_Ares_
+endif
+
+ifeq "$(SENSOR)" "Sensor_ICX631_VSP6244A_Pear"
+  SENSOR_TYPE = _SENSORLIB_ICX631_VSP6244A_Pear_
+endif
+
+ifeq "$(SENSOR)" "Sensor_ICX631_VSP6244A_Peach"
+  SENSOR_TYPE = _SENSORLIB_ICX631_VSP6244A_Peach_
+endif
+
+ifeq "$(SENSOR)" "Sensor_ICX631_VSP6244B_Hera"
+  SENSOR_TYPE = _SENSORLIB_ICX631_VSP6244B_Hera_
+endif
+
+ifeq "$(SENSOR)" "CMOS_S5K2P1YX"
+  SENSOR_TYPE = _SENSORLIB_CMOS_S5K2P1YX_
+endif
+
+ifeq "$(SENSOR)" "CMOS_IMX083CQK"
+  SENSOR_TYPE = _SENSORLIB_CMOS_IMX083CQK_
+endif
+
+ifeq "$(SENSOR)" "CMOS_MI5130"
+  SENSOR_TYPE = _SENSORLIB_CMOS_MI5130_
+endif
+
+ifeq "$(SENSOR)" "CMOS_MI5100"
+  SENSOR_TYPE = _SENSORLIB_CMOS_MI5100_
+endif
+
+ifeq "$(SENSOR)" "CMOS_AR0330P"
+  SENSOR_TYPE = _SENSORLIB_CMOS_AR0330P_
+endif
+
+ifeq "$(SENSOR)" "CMOS_AR0330M"
+  SENSOR_TYPE = _SENSORLIB_CMOS_AR0330M_
+endif
+
+ifeq "$(SENSOR)" "CMOS_OV2710"
+  SENSOR_TYPE = _SENSORLIB_CMOS_OV2710_
+endif
+
+ifeq "$(SENSOR)" "CMOS_OV2710M"
+  SENSOR_TYPE = _SENSORLIB_CMOS_OV2710M_
+endif
+
+ifeq "$(SENSOR)" "CMOS_MN34110"
+  SENSOR_TYPE = _SENSORLIB_CMOS_MN34110_
+endif
+
+ifeq "$(SENSOR)" "CMOS_IMX322LQJ"
+  SENSOR_TYPE = _SENSORLIB_CMOS_IMX322LQJ_
+endif
+
+ifeq "$(SENSOR)" "CMOS_IMX208PQH"
+  SENSOR_TYPE = _SENSORLIB_CMOS_IMX208PQH_
+endif
+
+ifeq "$(SENSOR)" "CMOS_IMX206CQC"
+  SENSOR_TYPE = _SENSORLIB_CMOS_IMX206CQC_
+endif
+
+ifeq "$(SENSOR)" "CMOS_IMX222LQJ"
+   SENSOR_TYPE = _SENSORLIB_CMOS_IMX222LQJ_
+endif
+
+ifeq "$(SENSOR)" "CMOS_IMX179"
+  SENSOR_TYPE = _SENSORLIB_CMOS_IMX179_
+endif
+
+ifeq "$(SENSOR)" "CMOS_OV8858"
+  SENSOR_TYPE = _SENSORLIB_CMOS_OV8858_
+endif
+
+ifeq "$(SENSOR)" "CMOS_IMX078CQK"
+  SENSOR_TYPE = _SENSORLIB_CMOS_IMX078CQK_
+endif
+
+ifeq "$(SENSOR)" "CMOS_GC2023P"
+  SENSOR_TYPE = _SENSORLIB_CMOS_GC2023P_
+endif
+
+
+ifeq "$(SENSOR)" "CMOS_NT99231M"
+  SENSOR_TYPE = _SENSORLIB_CMOS_NT99231M_
+endif
+
+ifeq "$(SENSOR)" "SEN_VIRTUAL"
+  SENSOR_TYPE = _SENSORLIB_VIRTUAL_
+endif
+
+ifeq "$(SENSOR)" "SEN_DUMMY"
+  SENSOR_TYPE = _SENSORLIB_DUMMY_
+endif
+
+ifeq "$(SENSOR)" "CMOS_F22P"
+  SENSOR_TYPE = _SENSORLIB_CMOS_F22P_
+endif
+
+ifeq "$(SENSOR)" "CMOS_IMX323LQN"
+  SENSOR_TYPE = _SENSORLIB_CMOS_IMX323LQN_
+endif
+
+ifeq "$(SENSOR)" "CMOS_F02C1M"
+  SENSOR_TYPE = _SENSORLIB_CMOS_F02C1M_
+endif
+
+SENSOR_PARAM = \
+    -D_SENSORLIB_PANA10M_433_=0 \
+    -D_SENSORLIB_PANA10M_ADDI9000_433_=1 \
+    -D_SENSORLIB_SONY12M_ADDI9000_433_=2 \
+    -D_SENSORLIB_PANA10M_ADDI9000_433_J1050_=3 \
+    -D_SENSORLIB_PANA10M_ADDI9004_433_=4 \
+    -D_SENSORLIB_SONY12M_ADDI9000_433_J1250_=5 \
+    -D_SENSORLIB_PANA10M_450_=6 \
+    -D_SENSORLIB_PANA14M_450_=7 \
+    -D_SENSORLIB_SONY14M_ADDI9004_450_=8 \
+    -D_SENSORLIB_SONY14M_ADDI9004_433_=9 \
+    -D_SENSORLIB_PANA10M_VSP6244A_433_=10 \
+    -D_SENSORLIB_PANA12M_ADDI9004_433_=11 \
+    -D_SENSORLIB_ICX631_VSP6244B_Mars3_=12 \
+    -D_SENSORLIB_ICX631_VSP6244B_Sivaco_=13 \
+    -D_SENSORLIB_RJ23Y3BC4LT_VSP6244A_Hera_=14 \
+    -D_SENSORLIB_ICX631_VSP6244A_Pear_=15 \
+    -D_SENSORLIB_ICX631_VSP6244A_Peach_=16 \
+    -D_SENSORLIB_ICX631_VSP6244B_Hera_=17 \
+    -D_SENSORLIB_RJ23Y3BC4LT_VSP6244A_Ares_=18 \
+    -D_SENSORLIB_CMOS_S5K2P1YX_=19 \
+    -D_SENSORLIB_CMOS_IMX083CQK_=20 \
+    -D_SENSORLIB_DUMMY_=21 \
+    -D_SENSORLIB_CMOS_MN34110_=22 \
+    -D_SENSORLIB_CMOS_MI5130_=23 \
+    -D_SENSORLIB_CMOS_AR0330P_=24 \
+    -D_SENSORLIB_CMOS_MI5100_=25 \
+    -D_SENSORLIB_CMOS_OV2710_=26 \
+    -D_SENSORLIB_CMOS_AR0330M_=27 \
+    -D_SENSORLIB_CMOS_IMX322LQJ_=28 \
+    -D_SENSORLIB_CMOS_IMX208PQH_=29 \
+    -D_SENSORLIB_CMOS_AR0333_=30 \
+    -D_SENSORLIB_CMOS_IMX222LQJ_=31 \
+    -D_SENSORLIB_CMOS_IMX179_=32 \
+    -D_SENSORLIB_CMOS_IMX078CQK_=33 \
+    -D_SENSORLIB_VIRTUAL_=34 \
+    -D_SENSORLIB_CMOS_OV2710M_=35 \
+    -D_SENSORLIB_CMOS_NT99231M_=36 \
+    -D_SENSORLIB_CMOS_IMX206CQC_=37 \
+    -D_SENSORLIB_CMOS_OV8858_=38 \
+    -D_SENSORLIB_CMOS_F22P_=39 \
+    -D_SENSORLIB_CMOS_IMX323LQN_=40 \
+    -D_SENSORLIB_CMOS_F02C1M_=41 \
+    -D_SENSORLIB_CMOS_GC2023P_=42 \
+    -D_SENSORLIB_=$(SENSOR_TYPE)
+
+#----------------------------------------------------------------------
+# Sensor2 parameters
+#----------------------------------------------------------------------
+ifeq "$(SENSOR_2)" "CMOS_NT99141"
+  SENSOR_TYPE_2 = _SENSORLIB2_CMOS_NT99141_
+endif
+
+ifeq "$(SENSOR_2)" "CMOS_NT99141_TI"
+  SENSOR_TYPE_2 = _SENSORLIB2_CMOS_NT99141_TI_
+endif
+
+ifeq "$(SENSOR_2)" "CMOS_TVP5150"
+  SENSOR_TYPE_2 = _SENSORLIB2_CMOS_TVP5150_
+endif
+
+
+ifeq "$(SENSOR_2)" "SEN_DUMMY"
+  SENSOR_TYPE_2 = _SENSORLIB2_DUMMY_
+endif
+
+SENSOR_PARAM_2 = \
+    -D_SENSORLIB2_CMOS_NT99141_=1 \
+    -D_SENSORLIB2_CMOS_NT99141_TI_=2 \
+    -D_SENSORLIB2_CMOS_TVP5150_=3 \
+    -D_SENSORLIB2_DUMMY_=4 \
+    -D_SENSORLIB2_=$(SENSOR_TYPE_2)
+
+#----------------------------------------------------------------------
+# IPP parameters
+#----------------------------------------------------------------------
+ifeq "$(IPP)" "IPL_IMX083_SAMPLE_FF"
+  IPP_TYPE = _IPL_IMX083_SAMPLE_FF_
+endif
+
+ifeq "$(IPP)" "IPL_MN34110_EVB_FF"
+  IPP_TYPE = _IPL_MN34110_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_MI5100_EVB_FF"
+  IPP_TYPE = _IPL_MI5100_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_IQSIM_SAMPLE_FF"
+  IPP_TYPE = _IPL_IQSIM_SAMPLE_FF_
+endif
+
+ifeq "$(IPP)" "IPL_AR0330P_EVB_FF"
+  IPP_TYPE = _IPL_AR0330P_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_AR0330M_EVB_FF"
+  IPP_TYPE = _IPL_AR0330M_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_OV2710_EVB_FF"
+  IPP_TYPE = _IPL_OV2710_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_IMX208PQH_EVB_FF"
+  IPP_TYPE = _IPL_IMX208PQH_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_GC2023P_EVB_FF"
+  IPP_TYPE = _IPL_GC2023P_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_AR0330_NT99141_MSDEMO_FFFF"
+  IPP_TYPE = _IPL_AR0330_NT99141_MSDEMO_FFFF_
+endif
+
+ifeq "$(IPP)" "IPL_IMX322LQJ_EVB_FF"
+  IPP_TYPE = _IPL_IMX322LQJ_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_AR0330_TVP5150_CARDV_FFFF"
+  IPP_TYPE = _IPL_AR0330_TVP5150_CARDV_FFFF_
+endif
+
+ifeq "$(IPP)" "IPL_OV8858_EVB_FF"
+  IPP_TYPE = _IPL_OV8858_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_VIRTUAL_TVP5150_CARDV_FFFF"
+  IPP_TYPE = _IPL_VIRTUAL_TVP5150_CARDV_FFFF_
+endif
+
+ifeq "$(IPP)" "IPL_IMX078CQK_SAMPLE_FF"
+  IPP_TYPE = _IPL_IMX078CQK_SAMPLE_FF_
+endif
+
+ifeq "$(IPP)" "IPL_NT99231_EVB_FF"
+  IPP_TYPE = _IPL_NT99231_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_Virtual_EVB_FF"
+  IPP_TYPE = "IPL_Virtual_EVB_FF"
+endif
+
+ifeq "$(IPP)" "IPL_AR0330M_C12"
+  IPP_TYPE = _IPL_AR0330M_C12_
+endif
+
+ifeq "$(IPP)" "IPL_IMX179_EVB_FF"
+  IPP_TYPE = _IPL_IMX179_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_F22P_C12_FF"
+  IPP_TYPE = _IPL_F22P_C12_FF_
+endif
+
+ifeq "$(IPP)" "IPL_IMX323LQN_EVB_FF"
+  IPP_TYPE = _IPL_IMX323LQN_EVB_FF_
+endif
+
+ifeq "$(IPP)" "IPL_IMX322LQJ_TVP5150_CARDV_FFFF"
+  IPP_TYPE = _IPL_IMX322LQJ_TVP5150_CARDV_FFFF_
+endif
+
+ifeq "$(IPP)" "IPL_GC2023P_TVP5150_CARDV_FFFF"
+  IPP_TYPE = _IPL_GC2023P_TVP5150_CARDV_FFFF_
+endif
+
+ifeq "$(IPP)" "IPL_MN34110_CARDV_FF"
+  IPP_TYPE = _IPL_MN34110_CARDV_FF_
+endif
+
+IPP_PARAM = \
+    -D_IPL_IMX083_SAMPLE_FF_=1 \
+    -D_IPL_MN34110_EVB_FF_=2 \
+    -D_IPL_MI5100_EVB_FF_=3 \
+    -D_IPL_IQSIM_SAMPLE_FF_=4 \
+    -D_IPL_AR0330P_EVB_FF_=5 \
+    -D_IPL_AR0330M_EVB_FF_=6 \
+    -D_IPL_OV2710_EVB_FF_=7 \
+    -D_IPL_IMX208PQH_EVB_FF_=8 \
+    -D_IPL_AR0330_NT99141_MSDEMO_FFFF_=9 \
+    -D_IPL_IMX322LQJ_EVB_FF_=10 \
+    -D_IPL_AR0330_TVP5150_CARDV_FFFF_=11 \
+    -D_IPL_VIRTUAL_TVP5150_CARDV_FFFF_=12 \
+    -D_IPL_OV8858_EVB_FF_=13 \
+    -D_IPL_IMX078CQK_SAMPLE_FF_=14 \
+    -D_IPL_NT99231_EVB_FF_=15 \
+    -D_IPL_Virtual_EVB_FF_=16 \
+    -D_IPL_AR0330M_C12_=17 \
+    -D_IPL_IMX179_EVB_FF_=18 \
+    -D_IPL_F22P_C12_FF_=19 \
+    -D_IPL_IMX323LQN_EVB_FF_=20 \
+    -D_IPL_IMX322LQJ_TVP5150_CARDV_FFFF_=21 \
+    -D_IPL_GC2023P_EVB_FF_=22 \
+    -D_IPL_GC2023P_TVP5150_CARDV_FFFF=23 \
+    -D_IPL_MN34110_CARDV_FF_=24 \
+    -D_IPPLIB_=$(IPP_TYPE)
+
+#----------------------------------------------------------------------
+# Link External IPP Calibration library or not
+#----------------------------------------------------------------------
+ifeq "$(IPP_CAL)" "ON"
+  IPP_CAL_EN = _ON_
+endif
+
+ifeq "$(IPP_CAL)" "OFF"
+  IPP_CAL_EN = _OFF_
+endif
+
+
+IPP_CAL_PARAM = \
+    -D_OFF_=0 \
+    -D_ON_=1 \
+    -D_IPP_CAL_EN_=$(IPP_CAL_EN)
+
+#----------------------------------------------------------------------
+# Lens parameters
+#----------------------------------------------------------------------
+ifeq "$(LENSDRV)" "LENSDRV_DCJ36"
+  LENSDRV_TYPE = _LENSDRVLIB_DCJ36_
+endif
+
+ifeq "$(LENSDRV)" "LENSDRV_FF1"
+  LENSDRV_TYPE = _LENSDRVLIB_FF1_
+endif
+
+LENSDRV_PARAM = \
+    -D_LENSDRVLIB_FF1_=0 \
+    -D_LENSDRVLIB_DCJ36_=1 \
+    -D_LENSDRVLIB_=$(LENSDRV_TYPE)
+
+#----------------------------------------------------------------------
+# Lens motor driver parameters
+#----------------------------------------------------------------------
+ifeq "$(LENSMOTOR)" "LENSMOTOR_FF1"
+  LENSMOTOR_TYPE = _LENSMOTORLIB_FF1_
+endif
+
+ifeq "$(LENSMOTOR)" "LENSMOTOR_G2007"
+  LENSMOTOR_TYPE = _LENSMOTORLIB_G2007_
+endif
+
+LENSMOTOR_PARAM = \
+    -D_LENSMOTORLIB_FF1_=0 \
+    -D_LENSMOTORLIB_G2007_=1 \
+    -D_LENSMOTORLIB_=$(LENSMOTOR_TYPE)
+
+#----------------------------------------------------------------------
+# External Audio parameters
+#----------------------------------------------------------------------
+ifeq "$(AUDIOEXT)" ""
+  AUDIO_EXT_TYPE = _AUDIOCODEC_EXT_NONE_
+endif
+
+ifeq "$(AUDIOEXT)" "AudCodecExt_WM8978"
+  AUDIO_EXT_TYPE = _AUDIOCODEC_EXT_WM8978_
+endif
+
+ifeq "$(AUDIOEXT)" "AudCodecExt_AIC3254"
+  AUDIO_EXT_TYPE = _AUDIOCODEC_EXT_AIC3254_
+endif
+
+AUDIO_PARAM = \
+    -D_AUDIOCODEC_EXT_NONE_=0 \
+    -D_AUDIOCODEC_EXT_WM8978_=1 \
+    -D_AUDIOCODEC_EXT_AIC3254_=2 \
+    -D_AUDIOCODEC_EXT_=$(AUDIO_EXT_TYPE)
+
+#----------------------------------------------------------------------
+# External Gyro parameters
+#----------------------------------------------------------------------
+ifeq "$(GYROEXT)" "Gyro_None"
+  GYRO_EXT_TYPE = _GYRO_EXT_NONE_
+endif
+
+ifeq "$(GYROEXT)" "Gyro_EWTS9PDN21"
+  GYRO_EXT_TYPE = _GYRO_EXT_EWTS9PDN21_
+endif
+
+
+GYRO_PARAM = \
+    -D_GYRO_EXT_NONE_=0 \
+    -D_GYRO_EXT_EWTS9PDN21_=1 \
+    -D_GYRO_EXT_=$(GYRO_EXT_TYPE)
+
+#----------------------------------------------------------------------
+# External GSensor parameters
+#----------------------------------------------------------------------
+ifeq "$(GSENSOREXT)" "GSensor_None"
+  GSENSOR_EXT_TYPE = _GSENSOR_EXT_NONE_
+endif
+
+ifeq "$(GSENSOREXT)" "GSensor_DRAMD07"
+  GSENSOR_EXT_TYPE = _GSENSOR_EXT_DRAMD07_
+endif
+
+ifeq "$(GSENSOREXT)" "GSensor_LIS3DH"
+  GSENSOR_EXT_TYPE = _GSENSOR_EXT_LIS3DH_
+endif
+
+ifeq "$(GSENSOREXT)" "GSensor_BMA253"
+  GSENSOR_EXT_TYPE = _GSENSOR_EXT_BMA253_
+endif
+
+ifeq "$(GSENSOREXT)" "GSensor_Combo"
+  GSENSOR_EXT_TYPE = _GSENSOR_EXT_COMBO_
+endif
+
+ifeq "$(GSENSOREXT)" "GSensor_DA380"
+  GSENSOR_EXT_TYPE = _GSENSOR_EXT_DA380_
+endif
+
+GSENSOR_PARAM = \
+    -D_GSENSOR_EXT_NONE_=0 \
+    -D_GSENSOR_EXT_DRAMD07_=1 \
+    -D_GSENSOR_EXT_LIS3DH_=2 \
+    -D_GSENSOR_EXT_BMA253_=3 \
+    -D_GSENSOR_EXT_COMBO_=4 \
+    -D_GSENSOR_EXT_DA380_=5 \
+    -D_GSENSOR_EXT_=$(GSENSOR_EXT_TYPE)
+
+#----------------------------------------------------------------------
+# Storage parameters
+#----------------------------------------------------------------------
+ifeq "$(STORAGE)" "Storage_NAND"
+  STORAGE_TYPE = _INTERSTORAGE_NAND_
+endif
+
+ifeq "$(STORAGE)" "Storage_EMMC"
+  STORAGE_TYPE = _INTERSTORAGE_EMMC_
+endif
+
+ifeq "$(STORAGE)" "Storage_SPI"
+  STORAGE_TYPE = _INTERSTORAGE_SPI_
+endif
+
+
+STORAGE_PARAM = \
+    -D_INTERSTORAGE_NAND_=0 \
+    -D_INTERSTORAGE_EMMC_=1 \
+    -D_INTERSTORAGE_SPI_=2 \
+    -D_INTERSTORAGE_=$(STORAGE_TYPE)
+
+#----------------------------------------------------------------------
+# Network parameters
+#----------------------------------------------------------------------
+ifeq "$(NETWORK)" ""
+  NETWORK_TYPE = _NETWORK_NONE_
+endif
+
+ifeq "$(NETWORK)" "NETWORK_SPI_EVB_ETHERNET"
+  NETWORK_TYPE = _NETWORK_SPI_EVB_ETHERNET_
+endif
+
+ifeq "$(NETWORK)" "NETWORK_SDIO_EVB_WIFI"
+  NETWORK_TYPE = _NETWORK_SDIO_EVB_WIFI_
+endif
+
+ifeq "$(NETWORK)" "NETWORK_SDIO_EVB_WIFI_BRCM"
+  NETWORK_TYPE = _NETWORK_SDIO_EVB_WIFI_BRCM_
+endif
+
+ifeq "$(NETWORK)" "NETWORK_SDIO_EVB_WIFI_NVT"
+  NETWORK_TYPE = _NETWORK_SDIO_EVB_WIFI_NVT_
+endif
+
+NETWORK_PARAM = \
+    -D_NETWORK_NONE_=0 \
+    -D_NETWORK_SPI_EVB_ETHERNET_=1 \
+    -D_NETWORK_SDIO_EVB_WIFI_=2 \
+    -D_NETWORK_SDIO_EVB_WIFI_BRCM_=3 \
+    -D_NETWORK_SDIO_EVB_WIFI_NVT_=4 \
+    -D_NETWORK_=$(NETWORK_TYPE)
+
+#----------------------------------------------------------------------
+# Wi-Fi module parameters
+#----------------------------------------------------------------------
+ifeq "$(WIFIMDL)" ""
+  WIFI_MODULE_TYPE = _WIFI_MODULE_NONE_
+endif
+
+ifeq "$(WIFIMDL)" "8189"
+  WIFI_MODULE_TYPE = _WIFI_MODULE_RTL8189_
+endif
+
+ifeq "$(WIFIMDL)" "8192"
+  WIFI_MODULE_TYPE = _WIFI_MODULE_RTL8192_
+endif
+
+ifeq "$(WIFIMDL)" "8189ftv"
+  WIFI_MODULE_TYPE = _WIFI_MODULE_RTL8189ftv_
+endif
+
+ifeq "$(WIFIMDL)" "8192pa"
+  WIFI_MODULE_TYPE = _WIFI_MODULE_RTL8192pa_
+endif
+
+ifeq "$(WIFIMDL)" "dhd"
+  WIFI_MODULE_TYPE = _WIFI_MODULE_DHD_
+endif
+
+ifeq "$(WIFIMDL)" "8821as"
+  WIFI_MODULE_TYPE = _WIFI_MODULE_RTL8821as_
+endif
+
+ifeq "$(WIFIMDL)" "8821paas"
+  WIFI_MODULE_TYPE = _WIFI_MODULE_RTL8821paas_
+endif
+
+ifeq "$(WIFIMDL)" "8189xtal26"
+  WIFI_MODULE_TYPE = _WIFI_MODULE_RTL8189xtal26_
+endif
+
+WIFI_MODULE_PARAM = \
+    -D_WIFI_MODULE_NONE_=0 \
+    -D_WIFI_MODULE_RTL8189_=1 \
+    -D_WIFI_MODULE_RTL8192_=2 \
+    -D_WIFI_MODULE_RTL8192pa_=3 \
+    -D_WIFI_MODULE_DHD_=4 \
+    -D_WIFI_MODULE_RTL8821as_=5 \
+    -D_WIFI_MODULE_RTL8821paas_=6 \
+    -D_WIFI_MODULE_RTL8189xtal26_=7 \
+    -D_WIFI_MODULE_RTL8189ftv_=8 \
+    -D_WIFI_MODULE_=$(WIFI_MODULE_TYPE)
+
+#----------------------------------------------------------------------
+# partila load parameters
+#----------------------------------------------------------------------
+ifeq "$(PARTIAL_LOAD)" "ON"
+    FWCOMPRESS_TYPE = _FWLOAD_PARTIAL_
+else
+    FWCOMPRESS_TYPE = _FWLOAD_FULL_
+endif
+
+ifeq "$(ARCH)" "ARM"
+FWLOAD_PARAM_ASM = \
+    -PD "_FWLOAD_FULL_ SETA 0" \
+    -PD "_FWLOAD_PARTIAL_ SETA 1" \
+    -PD "_FWLOAD_TYPE_ SETA $(FWCOMPRESS_TYPE)"
+endif
+
+#----------------------------------------------------------------------
+# FW partial load parameters
+#----------------------------------------------------------------------
+ifeq "$(FW_PARTIAL_COMPRESS)" "ON"
+    FWCOMPRESS_PARTIAL = _FW_PARTIAL_COMPRESS_ON_
+else
+    FWCOMPRESS_PARTIAL = _FW_PARTIAL_COMPRESS_OFF_
+endif
+
+FWCOMPRESS_PARTIAL_PARAM = \
+    -D_FW_PARTIAL_COMPRESS_ON_=0 \
+    -D_FW_PARTIAL_COMPRESS_OFF_=1 \
+    -D_FW_PARTIAL_COMPRESS_=$(FWCOMPRESS_PARTIAL)
+
+#----------------------------------------------------------------------
+# Model parameters
+#----------------------------------------------------------------------
+ifeq "$(MODEL)" "DEMO1_EVB"
+  MODEL_TYPE = _MODEL_EVB_
+endif
+
+ifeq "$(MODEL)" "DEMO1"
+  MODEL_TYPE = _MODEL_DEMO1_
+endif
+
+ifeq "$(MODEL)" "WIFICARDV"
+  MODEL_TYPE = _MODEL_DEMO1_
+endif
+
+ifeq "$(MODEL)" "655"
+  MODEL_TYPE = _MODEL_DEMO1_
+endif
+
+ifeq "$(MODEL)" "HTKW01"
+  MODEL_TYPE = _MODEL_HTKW01_
+endif
+
+ifeq "$(MODEL)" "B30W"
+  MODEL_TYPE = _MODEL_B30W_
+endif
+
+ifeq "$(MODEL)" "HDV02W"
+  MODEL_TYPE = _MODEL_HDV02W_
+endif
+
+ifeq "$(MODEL)" "WD6"
+  MODEL_TYPE = _MODEL_WD6_
+endif
+
+ifeq "$(MODEL)" "CARDV_DUAL_NOCABLE"
+  MODEL_TYPE = _MODEL_DUAL_NOCABLE_
+endif
+
+ifeq "$(MODEL)" "CARDV_DUAL_TVP5150"
+  MODEL_TYPE = _MODEL_DUAL_TVP5150_
+endif
+
+ifeq "$(MODEL)" "CARDV_DUAL"
+  MODEL_TYPE = _MODEL_DUAL_
+endif
+
+ifeq "$(MODEL)" "DV658"
+  MODEL_TYPE = _MODEL_DV658_
+endif
+
+ifeq "$(MODEL)" "CUBIC_MINI"
+  MODEL_TYPE = _MODEL_CUBIC_MINI_
+endif
+
+ifeq "$(MODEL)" "RAPOO_01"
+  MODEL_TYPE = _MODEL_RAPOO_01_
+endif
+
+ifeq "$(MODEL)" "IPCAM1_EVB"
+    MODEL_TYPE = _MODEL_IPCAM1_EVB_
+endif
+
+ifeq "$(MODEL)" "C12"
+    MODEL_TYPE = _MODEL_C12_
+endif
+
+ifeq "$(MODEL)" "CARDV_650"
+    MODEL_TYPE = _MODEL_CARDV_650_
+endif
+
+MODEL_PARAM = \
+    -D_MODEL_EVB_=0 \
+    -D_MODEL_DEMO1_=1 \
+    -D_MODEL_WIFICARDV_=2 \
+    -D_MODEL_HTKW01_=3 \
+    -D_MODEL_B30W_=4 \
+    -D_MODEL_HDV02W_=5 \
+    -D_MODEL_DUAL_NOCABLE_=6 \
+    -D_MODEL_DUAL_=7 \
+    -D_MODEL_DV658_=8 \
+    -D_MODEL_RAPOO_01_=9 \
+    -D_MODEL_IPCAM1_EVB_=10 \
+    -D_MODEL_DUAL_TVP5150_=11 \
+    -D_MODEL_CUBIC_MINI_=12 \
+    -D_MODEL_WD6_=13 \
+    -D_MODEL_C12_=14 \
+    -D_MODEL_CARDV_650_=15 \
+    -D_MODEL_DSC_=$(MODEL_TYPE)
+
+#----------------------------------------------------------------------
+# HW stage parameters
+#----------------------------------------------------------------------
+ifeq "$(HW_STAGE)" "HW_WS_STAGE"
+  HW_STAGE_TYPE = _HW_WS_STAGE_
+endif
+
+ifeq "$(HW_STAGE)" "HW_ES_STAGE"
+  HW_STAGE_TYPE = _HW_ES_STAGE_
+endif
+
+ifeq "$(HW_STAGE)" "HW_PP_STAGE"
+  HW_STAGE_TYPE = _HW_PP_STAGE_
+endif
+
+ifeq "$(HW_STAGE)" "HW_PP_STAGE"
+  HW_STAGE_TYPE = _HW_MP_STAGE_
+endif
+
+#define HW_WS_STAGE          1
+#define HW_ES_STAGE          2
+#define HW_PP_STAGE          3
+#define HW_MP_STAGE          4
+
+HW_STAGE_PARAM = \
+    -D_HW_WS_STAGE_=0 \
+    -D_HW_ES_STAGE_=1 \
+    -D_HW_PP_STAGE_=2 \
+    -D_HW_MP_STAGE_=3 \
+    -D_HW_STAGE_=$(HW_STAGE_TYPE)
+
+#----------------------------------------------------------------------
+# Qfunc UI parameters
+#----------------------------------------------------------------------
+ifeq "$(QFUNC_UI)" "NEW"
+  QFUNC_UI_TYPE = _QFUNC_UI_NEW_
+endif
+
+ifeq "$(QFUNC_UI)" "OLD"
+  QFUNC_UI_TYPE = _QFUNC_UI_OLD_
+endif
+
+QFUNCUI_PARAM = \
+    -D_QFUNC_UI_OLD_=0 \
+    -D_QFUNC_UI_NEW_=1 \
+    -D_QFUNC_UI_=$(QFUNC_UI_TYPE)
+
+#----------------------------------------------------------------------
+# UI Custom parameters
+#----------------------------------------------------------------------
+ifeq "$(UI_CUSTOM)" "GE"
+  UI_CUSTOM_TYPE = _UI_CUSTOM_GE_
+endif
+
+ifeq "$(UI_CUSTOM)" "HP"
+  UI_CUSTOM_TYPE = _UI_CUSTOM_HP_
+endif
+
+ifeq "$(UI_CUSTOM)" "AGFA"
+  UI_CUSTOM_TYPE = _UI_CUSTOM_AGFA_
+endif
+
+UI_CUSTOM_PARAM = \
+    -D_UI_CUSTOM_GE_=0 \
+    -D_UI_CUSTOM_HP_=1 \
+    -D_UI_CUSTOM_AGFA_=2 \
+    -D_UI_CUSTOM_=$(UI_CUSTOM_TYPE)
+
+
+#----------------------------------------------------------------------
+# IR Receiver device parameters
+#----------------------------------------------------------------------
+ifeq "$(IRRX)" "IrRx_NONE"
+  IRRX_TYPE = _IR_REMOTE_NONE_
+endif
+
+ifeq "$(IRRX)" "IrRx_NEC_IRRM"
+  IRRX_TYPE = _IR_REMOTE_NEC_
+endif
+
+IRRX_PARAM = \
+	-D_IR_REMOTE_NONE_=0 \
+	-D_IR_REMOTE_NEC_=1 \
+	-D_IR_REMOTE_=$(IRRX_TYPE)
+
+#----------------------------------------------------------------------
+# SSLCFG parameters
+#----------------------------------------------------------------------
+ifeq "$(SSLCFG)" "axtls_none"
+  SSL_TYPE = _SSL_OFF_
+endif
+
+ifeq "$(SSLCFG)" "axtls"
+  SSL_TYPE = _SSL_ON_
+endif
+
+SSL_PARAM = \
+    -D_SSL_OFF_=0 \
+    -D_SSL_ON_=1 \
+    -D_SSLTYPE_=$(SSL_TYPE)
+
+#----------------------------------------------------------------------
+# C define
+#----------------------------------------------------------------------
+DX_CFG = \
+    $(MODEL_PARAM) \
+    $(HW_STAGE_PARAM) \
+    $(MODESWITCH_PARAM) \
+    $(LCD_PARAM) \
+    $(LCD2_PARAM) \
+    $(TV_PARAM) \
+    $(HDMI_PARAM) \
+    $(SENSOR_PARAM) \
+    $(SENSOR_PARAM_2) \
+    $(AUDIO_PARAM) \
+    $(GYRO_PARAM) \
+    $(GSENSOR_PARAM) \
+    $(STORAGE_PARAM) \
+    $(FWCOMPRESS_PARTIAL_PARAM) \
+    $(LENSSWITCH_PARAM) \
+    $(LENSDRV_PARAM) \
+    $(IRRX_PARAM) \
+    $(LENSMOTOR_PARAM) \
+    $(NETWORK_PARAM) \
+    $(WIFI_MODULE_PARAM)
+
+PRJ_CFG = \
+    $(MODEL_PARAM) \
+    $(DRAMSIZE_PARAM) \
+    $(FWSIZE_PARAM) \
+    $(LANG_PARAM) \
+    $(EXCEPTION_CRUNTIME_MEMSIZE_PARAM) \
+    $(QFUNCUI_PARAM) \
+    $(UI_STYLE_PARAM) \
+    $(UI_CUSTOM_PARAM) \
+    $(UPDATE_CFG_PARAM) \
+    $(DISPLAY_169HD_PARAM) \
+    $(TV_DISPLAY_169HD_PARAM) \
+    $(PIP_VIEW_PARAM) \
+    $(MULTI_REC_PARAM) \
+    $(SENSOR2_720P_PARAM) \
+    $(IPP_PARAM) \
+    $(IPP_CAL_PARAM)  \
+    $(NETWORK_PARAM) \
+    $(SSL_PARAM) \
+    $(BIN_NAME_PARAM)
+
+C_DEFINE = \
+    $(CHIP_PARAM) \
+    $(DX_CFG)
+
+C_DEFINE_EXT = \
+    $(CHIP_PARAM) \
+    $(DX_CFG) \
+    $(PRJ_CFG)

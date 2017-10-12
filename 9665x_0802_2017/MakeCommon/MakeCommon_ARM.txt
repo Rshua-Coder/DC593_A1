@@ -1,0 +1,136 @@
+#----------------------------------------------------------------------
+# set the basic C and ASM flags
+#----------------------------------------------------------------------
+# -W+abcd..: Enable 'a' 'b' 'c' 'd'... warning message
+# g: Warning for unguarded header file
+# l: Warning for lower precsion in wider context
+# n: Warning for implicit narrowing cast
+# x = y * z; x is context, y * z is expression
+# Refer to ADS 1.2 Compilers and Libraries Guide for more information
+#----------------------------------------------------------------------
+# for Debug target
+CFLAGS_D    += $(INC_DIR) -c -O0 -g -cpu 4 -li -W+g -fa
+ASMFLAGS_D  += $(INC_DIR) -keep -g -cpu 4 -fpu None -li
+
+# for Release target
+CFLAGS_R    += $(INC_DIR) -c -O2 -cpu 4 -li -W+g -fa
+ASMFLAGS_R  += $(INC_DIR) -cpu 4 -fpu None -li
+
+# Generate debug symbol in release target
+ifeq "$(RELEASE_SYMBOL)" "ON"
+    CFLAGS_R    += -g
+    ASMFLAGS_R  += -keep -g
+endif
+
+#----------------------------------------------------------------------
+# Generate interleaved assembly language file for C source files in release target.
+# Check *.txt files in the folder where output *.o files.
+# Usage: make RELEASE_DISASSEMBLY="ON" release
+#----------------------------------------------------------------------
+ifeq "$(RELEASE_DISASSEMBLY)" "ON"
+    CFLAGS_R += -asm -fs -c -o newname.ext
+endif
+
+#----------------------------------------------------------------------
+# Generate Preprocessor codes for specific C source files in release target
+#
+# Using Step
+# (1) Make sure the bin file is built.
+# (2) delete the relative objs or modify c source files
+# (3) make RELEASE_PREPROCESSOR="ON" release
+# Note:
+# (1)List the .a file creatation date[armar -v -t kernel.a]
+# -list option: show the replace result(macro #define)
+#----------------------------------------------------------------------
+ifeq "$(RELEASE_PREPROCESSOR)" "ON"
+    CFLAGS_R += -list
+endif
+
+#----------------------------------------------------------------------
+# Generate one ELF section for each function
+#----------------------------------------------------------------------
+ifeq "$(SECTION_BY_FUNC)" "ON"
+    CFLAGS_R += -zo
+    CFLAGS_D += -zo
+endif
+
+# for dependency creating
+GCCFLAGS += $(INC_DIR) -I"$(ARMINC_DIR)" -c -w
+
+#----------------------------------------------------------------------
+# compile rule functions
+#----------------------------------------------------------------------
+ifeq "$(ISOLATE_DEP)" "ON"
+
+    # $(call compile_rule,object,source,cflags)
+    define compile_rule
+    $1: $2
+		@echo Compiling $(notdir $2) \
+		&& $(CC) $(PLATFORM_CFLAGS) $3 -o $1 $2 $$(LOG_OPTION)
+
+    endef
+
+    # $(call compile_rule_asm,object,source,asmflags)
+    define compile_rule_asm
+    $1: $2
+		@echo Assembling $(notdir $2) \
+		&& $(AS) $(PLATFORM_CFLAGS) $3 -o $1 $2 $$(LOG_OPTION)
+
+    endef
+
+else
+
+    # $(call compile_rule,object,source,cflags)
+    define compile_rule
+    $1: $2
+		@-$(GCC) -MM -MF $(basename $1).d -MP -MT $1 $(GCCFLAGS) $2 \
+		&& echo Compiling $(notdir $2)
+		@$(CC) $3 -o $1 $2 $$(LOG_OPTION)
+
+    endef
+
+    # $(call compile_rule_asm,object,source,asmflags)
+    define compile_rule_asm
+    $1: $2
+		echo Compiling $(notdir $2) \
+		-$(AS) $(ASMFLAGS_R) $2 --MD tmp \
+		&& echo $1: '\\' > $(basename $1).d \
+		&& sed -e 's/$(basename $(notdir $1))\.o\://g' \
+			-e 's/\\\/\//g' \
+			-e 's/\.s/.s \\\/g' \
+			-e 's/\.h/.h \\\/g' tmp >> $(basename $1).d
+		@-rm -f tmp $(notdir $1) \
+		&& echo Compiling $(notdir $2)
+		@$(AS) $3 -o $1 $2 $$(LOG_OPTION)
+
+    endef
+
+endif
+
+#-----------------------------------------------------------------
+# dependency rule functions
+#-----------------------------------------------------------------
+# $(call depend_rule,depend,source)
+define depend_rule
+$1: $2
+	@echo Depending $(notdir $2) \
+	&& $(GCC) -MM -MF $1 -MP -MT $(basename $1).o $(GCCFLAGS) $2 \
+	&& sed -e 's/_Data\/Debug\//_Data\/Release\//1' $1 > $(subst _Data/Debug/,_Data/Release/,$1)
+
+endef
+
+define depend_rule_asm
+$1: $2
+	@echo Depending $(notdir $2) \
+	&& $(AS) $(ASMFLAGS_R) $2 -Depend tmp \
+	&& echo $(basename $1).o: '\\' > $1 \
+	&& sed -e 's/$(basename $(notdir $1))\.o\://g' \
+		 -e 's/\\\/\//g' \
+		 -e 's/\.s/.s \\\/g' \
+		 -e 's/\.h/.h \\\/g' tmp > tmp2
+	@-cat tmp2 >> $1 \
+	&& echo $(basename $(subst _Data/Debug/,_Data/Release/,$1)).o: '\\' > $(subst _Data/Debug/,_Data/Release/,$1) \
+	&& cat tmp2 >> $(subst _Data/Debug/,_Data/Release/,$1) \
+	&& rm -f tmp tmp2 $(basename $(notdir $1)).o
+
+endef

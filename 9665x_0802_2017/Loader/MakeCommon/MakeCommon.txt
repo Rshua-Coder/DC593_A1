@@ -1,0 +1,313 @@
+
+#----------------------------------------------------------------------
+# get the source full path, convert upper case extension to lower case
+#----------------------------------------------------------------------
+SRC := $(addprefix $(shell cygpath --mixed $(shell pwd))/, $(SRC:.C=.c))
+ASM := $(addprefix $(shell cygpath --mixed $(shell pwd))/, $(ASM:.s=.S))
+
+
+#----------------------------------------------------------------------
+# set the basic include directories
+#----------------------------------------------------------------------
+MYPWD := $(shell pwd)
+LIB_PATH := $(findstring /LIB/, $(MYPWD))
+PRJ_PATH := $(shell find ./ -maxdepth 1 -name MakeConfig.txt)
+
+BASE_INC_DIR := $(filter %/Include, $(INC_DIR))
+DRIVER_INC_DIR := -I$(BASE_INC_DIR)/Driver
+
+# Total Include folder list here
+INC_DIR := $(addprefix -I, $(sort $(dir $(shell find $(INC_DIR) -name \'\*\.h\'))))
+
+# Filter out all chips' driver include path
+
+INC_DIR_WO_DRIVER := $(filter-out $(DRIVER_INC_DIR)%, $(INC_DIR))
+
+
+#$(info DIR_W_DRIVER = $(INC_DIR_W_DRIVER))
+#$(info DIR_WO_DRIVER = $(INC_DIR_WO_DRIVER))
+#$(info CHIP = $(CHIP))
+# Find specific chip's driver include path
+ifneq "$(PRJ_PATH)" ""
+DRIVER_INC_DIR := -I$(BASE_INC_DIR)/Driver650
+# Non-Project (AppExt, Application, LIB, LIBExt...)
+else
+DRIVER_INC_DIR := -I$(BASE_INC_DIR)/Driver650
+endif
+
+INC_DIR_W_DRIVER := $(filter $(DRIVER_INC_DIR)%, $(INC_DIR))
+
+# Real include path
+INC_DIR := $(INC_DIR_W_DRIVER) $(INC_DIR_WO_DRIVER)
+
+#$(info DIR_INC = $(INC_DIR))
+#----------------------------------------------------------------------
+# set the basic C and ASM flags
+#----------------------------------------------------------------------
+# -W+abcd..: Enable 'a' 'b' 'c' 'd'... warning message
+# g: Warning for unguarded header file
+# l: Warning for lower precsion in wider context
+# n: Warning for implicit narrowing cast
+# x = y * z; x is context, y * z is expression
+# Refer to ADS 1.2 Compilers and Libraries Guide for more information
+#----------------------------------------------------------------------
+ifeq "$(ARCH)" "MIPS"
+PLATFORM_CFLAGS= -march=24kec -mtune=24kec -EL -msoft-float
+PLATFORM_AFLAGS= -march=24kec -mtune=24kec -EL -msoft-float -mdsp
+PLATFORM_CFLAGS += -Wall -Wstrict-prototypes \
+    -fno-builtin -ffreestanding -fno-strict-aliasing -fno-common \
+    -fno-optimize-sibling-calls -fno-omit-frame-pointer
+#replace -Otime
+ifeq ("$(CFLAGS_D)", $(filter "$(CFLAGS_D)", "-Otime"))
+CFLAGS_D := $(filter-out $(CFLAGS_D), -Otime -O1)
+CFLAGS_D += -O2
+endif
+
+ifeq ("$(CFLAGS_R)", $(filter "$(CFLAGS_R)", "-Otime"))
+CFLAGS_R := $(filter-out $(CFLAGS_R), -Otime -O1)
+CFLAGS_R += -O2
+endif
+
+#slove sub-folder cannot include parent folder header file
+INC_DIR += -I$(CURDIR)
+# for Release mode
+GCCINC_DIR := $(shell $(CC) -print-file-name=include)
+CFLAGS_D += $(INC_DIR) -g -c -O0 -G0 -isystem "$(GCCINC_DIR)" -pipe $(PLATFORM_CFLAGS) -Wno-missing-braces
+CFLAGS_R += $(INC_DIR) -c -Os -G0 -isystem "$(GCCINC_DIR)" -pipe $(PLATFORM_CFLAGS) -Wno-missing-braces
+ASMFLAGS_D += -g $(INC_DIR) $(PLATFORM_AFLAGS)
+ASMFLAGS_R += $(INC_DIR) $(PLATFORM_AFLAGS)
+endif
+
+
+# Generate debug symbol in release target
+ifeq "$(RELEASE_SYMBOL)" "ON"
+CFLAGS_R += -g
+ASMFLAGS_R += -g
+endif
+
+
+#----------------------------------------------------------------------
+# Generate one ELF section for each function
+#----------------------------------------------------------------------
+ifeq "$(SECTION_BY_FUNC)" "ON"
+ifeq "$(ARCH)" "MIPS"
+CFLAGS_R += -ffunction-sections
+CFLAGS_D += -ffunction-sections
+endif
+ifeq "$(ARCH)" "ARM"
+CFLAGS_R += -zo
+CFLAGS_D += -zo
+endif
+endif
+
+#----------------------------------------------------------------------
+# FPGA notification for drivers
+#----------------------------------------------------------------------
+ifeq "$(FPGA_EMULATION)" "ON"
+CFLAGS_R += -D_FPGA_EMULATION_=1
+CFLAGS_D += -D_FPGA_EMULATION_=1
+CFLAGS_R += -D_FPGA_PLL_OSC_=$(FPGA_PLL_OSC)
+CFLAGS_D += -D_FPGA_PLL_OSC_=$(FPGA_PLL_OSC)
+else
+CFLAGS_R += -D_FPGA_EMULATION_=0
+CFLAGS_D += -D_FPGA_EMULATION_=0
+endif
+
+GCCFLAGS += $(INC_DIR) -I"$(ARMINC_DIR)" -c -w
+
+#----------------------------------------------------------------------
+# set the directory for debug/release objects and images here
+#----------------------------------------------------------------------
+OBJ_RELEASE = $(PRJ_NAME)_Data/Release/ObjectCode
+IMG_RELEASE = $(IMG_BASE_DIR)/Release
+
+OBJ_DEBUG = $(PRJ_NAME)_Data/Debug/ObjectCode
+
+IMG_DEBUG = $(IMG_BASE_DIR)/Debug
+
+#----------------------------------------------------------------------
+# set the make outputs
+#----------------------------------------------------------------------
+SRC_OBJ_R := $(addprefix $(OBJ_RELEASE)/, $(notdir $(SRC:.c=.o)))
+ASM_OBJ_R := $(addprefix $(OBJ_RELEASE)/, $(notdir $(ASM:.S=.o)))
+ALL_OBJ_R := $(ASM_OBJ_R) $(SRC_OBJ_R)
+DEPFILE_R := $(subst .o,.d,$(ALL_OBJ_R))
+
+ifeq "$(ISOLATE_DEP)" "ON"
+ALL_DEP := $(DEPFILE_R)
+endif
+
+#----------------------------------------------------------------------
+# set the make targets
+#----------------------------------------------------------------------
+build_all: rm_log build_R
+
+make_release_begin:
+	@-echo Checking $(basename $(notdir $(IMAGE_R))) $(COMPILER) release target ... \
+	&& mkdir -p $(IMG_RELEASE) $(OBJ_RELEASE)
+
+ifeq "$(ISOLATE_DEP)" "ON"
+make_dep_begin:
+	@-echo Checking $(basename $(notdir $(IMAGE_R))) dependency ... \
+	&& mkdir -p $(OBJ_RELEASE)
+
+endif
+
+#----------------------------------------------------------------------
+# compile rule functions
+#----------------------------------------------------------------------
+# $(call get_obj,obj_dir,source)
+get_obj = $(addprefix $1/, $(subst .c,.o,$(notdir $2)))
+
+# $(call get_obj_asm,obj_dir,source)
+get_obj_asm = $(addprefix $1/, $(subst .S,.o,$(notdir $2)))
+
+ifeq "$(ISOLATE_DEP)" "ON"
+# $(call compile_rule,object,source,cflags)
+define compile_rule
+$1: $2
+	@echo Compiling $(notdir $2) \
+	&& $(CC) $3 -o $1 $2 $$(LOG_OPTION)
+
+endef
+
+# $(call compile_rule_asm,object,source,asmflags)
+define compile_rule_asm
+
+$1: $2
+	@echo Compiling $(notdir $2)\
+    && $(CC) $(PLATFORM_CFLAGS) -c $3 -o $1 $2 $$(LOG_OPTION)
+
+endef
+
+else
+# $(call compile_rule,object,source,cflags)
+define compile_rule
+$1: $2
+	echo @-$(GCC) -MM -MF $(basename $1).d -MP -MT $1 $(GCCFLAGS) $2
+	@-$(GCC) -MM -MF $(basename $1).d -MP -MT $1 $(GCCFLAGS) $2 \
+	echo Compiling $(notdir $2) $(CC) $3 $2 -o $1
+	@$(CC) $3 $2 -o $1 $$(LOG_OPTION)
+
+endef
+
+# $(call compile_rule_asm,object,source,asmflags)
+define compile_rule_asm
+$1: $2
+	@-$(AS) $(ASMFLAGS_R) $2 -Depend tmp\
+	&& echo $1: '\\' > $(basename $1).d \
+	&& sed -e 's/$(basename $(notdir $1))\.o\://g' \
+		-e 's/\\\/\//g' \
+		-e 's/\.s/.s \\\/g' \
+		-e 's/\.h/.h \\\/g' tmp >> $(basename $1).d
+
+	@-rm -f tmp $(notdir $1) \
+	&& echo Compiling $(notdir $2)
+	@$(AS) $3 -o $1 $2 $$(LOG_OPTION)
+
+endef
+endif
+
+# $(call compile_all,obj_dir,cflags)
+define compile_all
+$(foreach i, $(SRC), \
+	$(call compile_rule,$(call get_obj,$1,$i),$i,$2))
+endef
+
+# $(call compile_all_asm,obj_dir,asmflags)
+define compile_all_asm
+$(foreach i, $(ASM), \
+	$(call compile_rule_asm,$(call get_obj_asm,$1,$i),$i,$2))
+endef
+
+#-----------------------------------------------------------------
+# dependency rule functions
+#-----------------------------------------------------------------
+ifeq "$(ISOLATE_DEP)" "ON"
+# $(call get_dep,dep_dir,source)
+get_dep = $(addprefix $1/, $(subst .c,.d,$(notdir $2)))
+
+# $(call get_dep_asm,dep_dir,source)
+get_dep_asm = $(addprefix $1/, $(subst .s,.d,$(notdir $2)))
+
+# $(call depend_rule,depend,source)
+define depend_rule
+$1: $2
+	@echo Depending $(notdir $2) \
+	&& $(GCC) -MM -MF $1 -MP -MT $(basename $1).o $(GCCFLAGS) $2 \
+	&& sed -e 's/_Data\/Debug\//_Data\/Release\//1' $1 > $(subst _Data/Debug/:,_Data/Release/:,$1)
+
+endef
+
+#NT#2011/04/25#Niven Cho#[0017454] -begin
+# $(call depend_rule_asm,depend,source)
+define depend_rule_asm
+
+ifeq "$(ARCH)" "MIPS"
+$1: $2
+	@echo Depending $(notdir $2) \
+	&& $(AS) $(ASMFLAGS_R) $2 --MD $1 -o $(basename $1).o \
+	&& echo $1: '\\' > $(basename $1).d \
+	&& sed -e 's/_Data\/Debug\//_Data\/Release\//1' $1 > $(subst _Data/Debug/,_Data/Release/,$1) \
+	&& rm -f $(basename $1).o
+endif
+
+ifeq "$(ARCH)" "ARM"
+$1: $2
+	@echo Depending $(notdir $2) \
+	&& $(AS) $(ASMFLAGS_R) $2 -Depend tmp \
+	&& echo $(basename $1).o: '\\' > $1 \
+	&& sed -e 's/$(basename $(notdir $1))\.o\://g' \
+		 -e 's/\\\/\//g' \
+		 -e 's/\.s/.s \\\/g' \
+		 -e 's/\.h/.h \\\/g' tmp > tmp2
+	@-cat tmp2 >> $1 \
+	&& echo $(basename $(subst _Data/Debug/,_Data/Release/,$1)).o: '\\' > $(subst _Data/Debug/,_Data/Release/,$1) \
+	&& cat tmp2 >> $(subst _Data/Debug/,_Data/Release/,$1) \
+	&& rm -f tmp tmp2 $(basename $(notdir $1)).o
+endif
+#NT#2011/04/25#[0017454]#Niven Cho -end
+
+endef
+
+define depend_all
+$(foreach i, $(SRC), \
+	$(call depend_rule,$(call get_dep,$1,$i),$i))
+endef
+
+# $(call dep_all_asm,dep_dir)
+define depend_all_asm
+$(foreach i, $(ASM), \
+	$(call depend_rule_asm,$(call get_dep_asm,$1,$i),$i))
+endef
+
+ifeq "$(MAKECMDGOALS)" "dep"
+$(eval $(call depend_all,$(OBJ_RELEASE)))
+$(eval $(call depend_all_asm,$(OBJ_RELEASE)))
+endif
+
+ifeq "$(MAKECMDGOALS)" ""
+.DEFAULT_GOAL := all
+endif
+
+else
+
+ifeq "$(MAKECMDGOALS)" ""
+-include $(DEPFILE_R)
+$(eval $(call compile_all,$(OBJ_RELEASE),$(CFLAGS_R)))
+$(eval $(call compile_all_asm,$(OBJ_RELEASE),$(ASMFLAGS_R)))
+endif
+
+ifeq "$(MAKECMDGOALS)" "rebuild"
+-include $(DEPFILE_R)
+$(eval $(call compile_all,$(OBJ_RELEASE),$(CFLAGS_R)))
+$(eval $(call compile_all_asm,$(OBJ_RELEASE),$(ASMFLAGS_R)))
+endif
+
+endif
+
+ifeq "$(MAKECMDGOALS)" "release"
+-include $(DEPFILE_R)
+$(eval $(call compile_all,$(OBJ_RELEASE),$(CFLAGS_R)))
+$(eval $(call compile_all_asm,$(OBJ_RELEASE),$(CFLAGS_R)))
+endif

@@ -1,0 +1,513 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+#------------------------------------------------------------------------------
+# Loader version : unsigned long loader version definition
+#------------------------------------------------------------------------------
+LOADER_VERSION = 0x01000023
+BL_LOADER_VER_PARAM = \
+	-D_LDR_VER_="$(LOADER_VERSION)"
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+# Hardware device selection
+#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#------------------------------------------------------------------------------
+# Select loader supported NAND list(3 type vendor)
+# Note: Please select vendor list bellow(do not change string)
+# Once vendor name not list here, please let 3 support list leave empty or fill
+# DEFAULT_NAND_TYPE and call for NTK help
+# samsung_128M_2K
+# ato_128M_2K
+# toshiba_128M_2K
+# toshiba_128M_2K_TC58NVG0S3ETA
+# esmt_128M_2K
+# hynix_128M_2K
+# spansion_128M_2K
+# mxic_128M_2K
+# samsung_32M_512
+# hynix_32M_512
+# winbond_128M_2K
+# DEFAULT_NAND_TYPE
+#------------------------------------------------------------------------------
+LOADER_SUPPORT_NAND_1st = samsung_128M_2K
+LOADER_SUPPORT_NAND_2nd = ato_128M_2K
+LOADER_SUPPORT_NAND_3rd = toshiba_128M_2K
+
+#------------------------------------------------------------------------------
+# Select main chip ID
+# (If host IC is NT96656, just set CHIP as 650)
+#------------------------------------------------------------------------------
+#CHIP = 650
+#CHIP = 655
+CHIP = 658
+
+ifeq "$(CHIP)" "650"
+	CHIP_TYPE = _CHIP_650_
+endif
+
+ifeq "$(CHIP)" "655"
+	CHIP_TYPE = _CHIP_655_
+endif
+
+ifeq "$(CHIP)" "658"
+	CHIP_TYPE = _CHIP_658_
+endif
+
+CHIP_PARAM = \
+    -D_CHIP_650_=0 \
+    -D_CHIP_655_=1 \
+    -D_CHIP_658_=2 \
+    -D_CHIP_=$(CHIP_TYPE)
+
+#------------------------------------------------------------------------------
+# Select chip version
+#------------------------------------------------------------------------------
+ifeq "$(CHIP)" "650"
+CHIP_VER = A
+else
+CHIP_VER = B
+endif
+
+#------------------------------------------------------------------------------
+# Select LV1 clock rate
+# (Only select LV1 as 400MHz when host IC is NT96656)
+# (Select LV1 as 373MHz when host IC is NT96650C/NT96655)
+# LV1: 373MHz / 400MHz
+#------------------------------------------------------------------------------
+LV1_CLK = 373
+#LV1_CLK = 400
+
+#------------------------------------------------------------------------------
+# Select DMA clock rate
+# LV0: lower frequency, LV1: higher frequency
+#------------------------------------------------------------------------------
+#DMA_CLOCK = LV1
+#DMA_CLOCK = LV0
+
+ifeq "$(CHIP)" "650"
+	DMA_CLOCK = LV0
+else
+	DMA_CLOCK = LV1
+endif
+
+ifeq "$(CHIP_VER)" "A"
+# Force LV1_CLK to 400MHz when CHIP_VER is "A"
+LV1_CLK = 400
+endif
+ifeq "$(DMA_CLOCK)" "LV1"
+ifeq "$(LV1_CLK)" "373"
+DMA_CLOCK = LV1_3
+else
+DMA_CLOCK = LV1_4
+endif
+endif
+
+#------------------------------------------------------------------------------
+# Select DRAM Size (unit: Giga bit)
+#------------------------------------------------------------------------------
+SDRAM_SIZE = 1024
+#SDRAM_SIZE = 2048
+
+#------------------------------------------------------------------------------
+# Select DRAM Type (DDR3L only valid in NT96656)
+# (Only select DDR3L when LV1_CLK = 400, i.e. host IC is NT96656)
+#------------------------------------------------------------------------------
+DRAM_TYPE = DDR3
+#DRAM_TYPE = DDR3L
+
+#------------------------------------------------------------------------------
+# Select Phy analog block LV / HV
+# (Don't modify this item)
+#------------------------------------------------------------------------------
+PHY_ANALOG_HV = HV
+#PHY_ANALOG_HV = LV
+
+#------------------------------------------------------------------------------
+# Select Size of Main Code (to be loaded by loader)
+#------------------------------------------------------------------------------
+FW_MAX_CODE_SIZE = 0x3C0000
+
+BL_FWSIZE_PARAM = \
+-DFW_MAX_CODE_SIZE=$(FW_MAX_CODE_SIZE)
+
+
+#------------------------------------------------------------------------------
+# CPU Core version configuration
+# (Don't modify this item)
+#------------------------------------------------------------------------------
+CPU_CORE = MIPS24KE
+
+#------------------------------------------------------------------------------
+# Select internal storage device
+#------------------------------------------------------------------------------
+#STORAGEINT = NandEccRS
+STORAGEINT = SpiFlash
+
+#------------------------------------------------------------------------------
+# Select external storage device
+#------------------------------------------------------------------------------
+STORAGEEXT = Sdio1
+#STORAGEEXT = Sdio2
+#STORAGEEXT = Usb
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#
+# Software function selection
+#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#------------------------------------------------------------------------------
+# Dram range scan loader support enable
+# (Don't modify this item)
+#------------------------------------------------------------------------------
+DRAM_RANGE_SCAN_SUPPORT_EN = ENABLE
+#DRAM_RANGE_SCAN_SUPPORT_EN = DISABLE
+
+#------------------------------------------------------------------------------
+# Select GUI interface display or not
+#------------------------------------------------------------------------------
+#CONFIG_RAM_GUI_EN = ENABLE
+CONFIG_RAM_GUI_EN = DISABLE
+
+#------------------------------------------------------------------------------
+# Set binary file build name
+#------------------------------------------------------------------------------
+#BIN_NAME = LD96$(CHIP)A
+#TMP_NAME = LD96$(CHIP)1
+BIN_NAME = LD$(MODEL_NAME)
+TMP_NAME = LD$(MODEL_NAME)T
+
+#------------------------------------------------------------------------------
+# 1st NAND configuration support list
+#------------------------------------------------------------------------------
+ifeq "$(LOADER_SUPPORT_NAND_1st)" "DEFAULT_NAND_TYPE"
+	_LOADER_NAND_SUPPORT_NAND_1st_ = default_1
+else
+ifeq "$(LOADER_SUPPORT_NAND_1st)" ""
+  _LOADER_NAND_SUPPORT_NAND_1st_ = default_1
+else
+  _LOADER_NAND_SUPPORT_NAND_1st_ = $(LOADER_SUPPORT_NAND_1st)
+endif
+endif
+#------------------------------------------------------------------------------
+# 1st NAND configuration support list
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# 2nd NAND configuration support list
+#------------------------------------------------------------------------------
+ifeq "$(LOADER_SUPPORT_NAND_2nd)" "DEFAULT_NAND_TYPE"
+	_LOADER_NAND_SUPPORT_NAND_2nd_=default_2
+else
+ifeq "$(LOADER_SUPPORT_NAND_2nd)" ""
+  _LOADER_NAND_SUPPORT_NAND_2nd_ = default_2
+else
+  _LOADER_NAND_SUPPORT_NAND_2nd_ = $(LOADER_SUPPORT_NAND_2nd)
+endif
+endif
+#------------------------------------------------------------------------------
+# 2nd NAND configuration support list
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# 3rd NAND configuration support list
+#------------------------------------------------------------------------------
+ifeq "$(LOADER_SUPPORT_NAND_3rd)" "DEFAULT_NAND_TYPE"
+	_LOADER_NAND_SUPPORT_NAND_3rd_ = default_3
+else
+ifeq "$(LOADER_SUPPORT_NAND_3rd)" ""
+  _LOADER_NAND_SUPPORT_NAND_3rd_ = default_3
+else
+  _LOADER_NAND_SUPPORT_NAND_3rd_ = $(LOADER_SUPPORT_NAND_3rd)
+endif
+endif
+
+#------------------------------------------------------------------------------
+# 3rd NAND configuration support list
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Set bootloader specific strings
+#------------------------------------------------------------------------------
+STR_MODEL = $(MODEL)
+STR_DATE = $(shell date +%m/%d/%Y)
+STR_TIME = $(shell date +%H:%M:%S)
+
+BL_START = " $(MODEL_NAME) Loader NT96$(CHIP) Start ..."
+BL_UPDATE_FWNAME = FW$(MODEL_NAME).BIN
+BL_UPDATE_CALNAME = FW$(MODEL_NAME)C.BIN
+BL_UPDATE_LOADERNAME = $(BIN_NAME).BIN
+BL_RUN_FWNAME = FW96$(CHIP)T.BIN
+
+MODEL = "$(CHIP)$(CHIP_VER)_$(DRAM_TYPE)_$(DMA_CLOCK)_$(SDRAM_SIZE)Mb"
+BL_VERSION = "$(MODEL) $(STR_DATE) $(STR_TIME)"
+
+#------------------------------------------------------------------------------
+# Select bootloader compression
+# (Don't modify this item)
+#------------------------------------------------------------------------------
+BL_COMPRESS = ENABLE
+#BL_COMPRESS = DISABLE
+
+#Do not modify this parameter 0x08 if loader compress enabled
+UNCOMPRESSEDPART_SIZE_OFFSET = 0x08
+
+#------------------------------------------------------------------------------
+# Select compressable f/w (main code)
+#------------------------------------------------------------------------------
+MAINCODE_COMPRESS = ENABLE
+#MAINCODE_COMPRESS = DISABLE
+
+#------------------------------------------------------------------------------
+# Select firmware image checksum validation
+#------------------------------------------------------------------------------
+#CHKFWIMAGE = NOCHECK
+CHKFWIMAGE = CHECKSUM
+#CHKFWIMAGE = CRC
+
+#------------------------------------------------------------------------------
+# Select loader flow
+# (Don't modify this item)
+#------------------------------------------------------------------------------
+LOADER_FLOW = NORMAL_LDR_FLOW
+#LOADER_FLOW = MODULE_TST_FLOW
+
+ifeq "$(LOADER_FLOW)" "NORMAL_LDR_FLOW"
+BL_LOADER_FLOW = 0
+else
+BL_LOADER_FLOW = 1
+endif
+
+BL_LOADER_FLOW_PARAM = \
+-D_BL_MAIN_SPECIAL_FLOW_=$(BL_LOADER_FLOW)
+
+#------------------------------------------------------------------------------
+# Select Duty calibration ENABLE / DISABLE
+#------------------------------------------------------------------------------
+ifeq "$(CHIP_VER)" "A"
+DUTY_CALIBRATION = DISABLE
+else
+DUTY_CALIBRATION = ENABLE
+endif
+
+#------------------------------------------------------------------------------
+# Select Duty calibration type
+# (Don't modify this item)
+#------------------------------------------------------------------------------
+DUTY_CALIBRATION_TYPE = AUTO
+#DUTY_CALIBRATION_TYPE = MANUAL
+
+ifeq "$(DUTY_CALIBRATION_TYPE)" "AUTO"
+BL_DUTY_CALIBRATION_TYPE = 0
+else
+BL_DUTY_CALIBRATION_TYPE = 1
+endif
+
+BL_DUTY_CALIBRATION_TYPE_PARAM = \
+-D_LOADER_DUTY_CALIBRATION_TYPE_=$(BL_DUTY_CALIBRATION_TYPE)
+
+#------------------------------------------------------------------------------
+# Select Duty calibration LOG ENABLE / DISABLE
+#------------------------------------------------------------------------------
+#DUTY_CALIBRATION_LOG = ENABLE
+DUTY_CALIBRATION_LOG = DISABLE
+
+ifeq "$(LOADER_FLOW)" "MODULE_TST_FLOW"
+DUTY_CALIBRATION = DISABLE
+endif
+
+ifeq "$(DUTY_CALIBRATION)" "DISABLE"
+DUTY_CALIBRATION_LOG = DISABLE
+else
+ifeq "$(DUTY_CALIBRATION_TYPE)" "MANUAL"
+DUTY_CALIBRATION_LOG = DISABLE
+endif
+endif
+
+ifeq "$(DUTY_CALIBRATION)" "ENABLE"
+BL_DUTY_CALIBRATION = 1
+else
+BL_DUTY_CALIBRATION = 0
+endif
+
+ifeq "$(DUTY_CALIBRATION_LOG)" "ENABLE"
+BL_DUTY_CALIBRATION_LOG = 1
+else
+BL_DUTY_CALIBRATION_LOG = 0
+endif
+
+BL_DUTY_CALIBRATION_PARAM = \
+-D_LOADER_DUTY_CALIBRATION_LOG_=$(BL_DUTY_CALIBRATION_LOG)\
+-D_LOADER_DUTY_CALIBRATION_=$(BL_DUTY_CALIBRATION)
+
+
+#------------------------------------------------------------------------------
+# Bootloader update image file name parameters
+#------------------------------------------------------------------------------
+BL_UPDATE_NAME_PARAM = \
+	-D_UPDATE_FW_NAME_=\"$(BL_UPDATE_FWNAME)\" \
+	-D_UPDATE_LOADER_NAME_=\"$(BL_UPDATE_LOADERNAME)\" \
+	-D_RUN_FW_NAME_=\"$(BL_RUN_FWNAME)\" \
+	-D_UPDATE_CALFW_NAME_=\"$(BL_UPDATE_CALNAME)\"
+
+#------------------------------------------------------------------------------
+# Bootloader specific strings parameters
+#------------------------------------------------------------------------------
+BL_STRINGS_PARAM = \
+-D_LOADER_VERSION_STR_=\"\\\r\\\n$(BL_VERSION)\\\r\\\n\\\r\\\n\" \
+-D_LOADER_START_STR_=\"\\\r\\\n$(BL_START)\\\r\\\n\"
+
+#------------------------------------------------------------------------------
+# Bootloader compression parameters
+#------------------------------------------------------------------------------
+ifeq "$(BL_COMPRESS)" "ENABLE"
+  BL_COMPRESS_CFG = 1
+ifeq "$(CHIP_VER)" "A"
+  RESETFLAG = LZ_A
+else
+  ifeq "$(CHIP)" "655"
+    RESETFLAG = LZ655
+  else
+    RESETFLAG = LZ
+  endif
+  #------------------------------------------------------------------------------
+  # Dram size MUST be 1024 if 657/658
+  #------------------------------------------------------------------------------
+  ifeq "$(CHIP)" "658"
+    RESETFLAG = LZ658
+    SDRAM_SIZE = 1024
+  endif
+endif
+else
+  BL_COMPRESS_CFG = 0
+  RESETFLAG = NM
+endif
+
+ifeq "$(MAINCODE_COMPRESS)" "ENABLE"
+  FWCOMPRESS_PARAM = -D_MAINCODE_COMPRESS_=1
+else
+  FWCOMPRESS_PARAM = -D_MAINCODE_COMPRESS_=0
+endif
+
+BL_COMPRESS_PARAM = \
+-D_LOADER_COMPRESSED_=$(BL_COMPRESS_CFG)
+
+BL_COMPRESS_PARAM_ASM =
+#\
+#-PD "_LOADER_COMPRESSED_ SETA $(BL_COMPRESS_CFG)"
+
+#------------------------------------------------------------------------------
+# Firmware image checksum validation parameters
+#------------------------------------------------------------------------------
+ifeq "$(CHKFWIMAGE)" "NOCHECK"
+    CHKFWIMAGE_CFG = FW_CHECK_NOCHECK
+endif
+
+ifeq "$(CHKFWIMAGE)" "CHECKSUM"
+    CHKFWIMAGE_CFG = FW_CHECK_CHECKSUM
+endif
+
+ifeq "$(CHKFWIMAGE)" "CRC"
+    CHKFWIMAGE_CFG = FW_CHECK_CRC
+endif
+
+CHKFWIMAGE_PARAM = \
+    -DFW_CHECK_NOCHECK=0 \
+    -DFW_CHECK_CHECKSUM=1 \
+    -DFW_CHECK_CRC=2 \
+    -DFW_CHECK_METHOD=$(CHKFWIMAGE_CFG)
+
+
+#------------------------------------------------------------------------------
+# SPI define
+#------------------------------------------------------------------------------
+ifeq "$(STORAGEINT)" "SpiFlash"
+    STORAGE_INT_TYPE = -DSTORAGEINT_SPI=1
+else
+    STORAGE_INT_TYPE =
+endif
+
+#------------------------------------------------------------------------------
+# Dram range scan support enable parameters
+#------------------------------------------------------------------------------
+ifeq "$(DRAM_RANGE_SCAN_SUPPORT_EN)" "ENABLE"
+    DRAM_SCAN_EN = 1
+else
+	DRAM_SCAN_EN = 0
+endif
+
+DRAMSCAN_PARAM = -DDRAM_RANGE_SCAN_EN=$(DRAM_SCAN_EN)
+
+#------------------------------------------------------------------------------
+# DRAM ini file name generation
+#------------------------------------------------------------------------------
+ifeq "$(DRAM_TYPE)" "DDR3L"
+    ifeq "$(DMA_CLOCK)" "LV0"
+        $(error DDR3L only support DMA_CLOCK = LV1)
+    endif
+    ifeq "$(LV1_CLK)" "373"
+        $(error DDR3L only support LV1_CLK = 400)
+    endif
+    DDR_FILE_STR = _DDR3L
+else
+    DDR_FILE_STR =
+endif
+#------------------------------------------------------------------------------
+# DCT special func parameters
+#------------------------------------------------------------------------------
+#DC503S--LD
+#MODEL_NAME = DC503S
+#DCT556--LD
+#MODEL_NAME = DCT556
+#DCT586--LD
+#MODEL_NAME = DCT586
+#DCT558--LD
+#MODEL_NAME = DCT558
+#SC2033+NT96658A
+#MODEL_NAME = DC586A
+#SC2033+NT96658C
+#MODEL_NAME = DC586C
+#GD581--LD
+#MODEL_NAME = GD581
+#DCT590--LD
+#MODEL_NAME = DCT590
+#HS581--LD
+#MODEL_NAME = HS581
+#SY593--LD
+MODEL_NAME = SYA1
+
+ifeq "$(MODEL_NAME)" "DC503S"
+        MODE_TYPE = _MODE_DC503S_
+endif
+ifeq "$(MODEL_NAME)" "DCT556"
+        MODE_TYPE = _MODE_DCT556_
+endif
+ifeq "$(MODEL_NAME)" "DCT586"
+        MODE_TYPE = _MODE_DCT586_
+endif
+ifeq "$(MODEL_NAME)" "DCT558"
+        MODE_TYPE = _MODE_DCT558_
+endif
+
+ifeq "$(MODEL_NAME)" "DC586C"
+        MODE_TYPE = _MODE_DC586C_
+endif
+
+ifeq "$(MODEL_NAME)" "GD581"
+        MODE_TYPE = _MODE_GD581_
+endif
+
+MODEL_PARAM = \
+    -D_MODE_DC503S_=0 \
+    -D_MODE_DCT556_=1 \
+    -D_MODE_DCT586_=2 \
+	-D_MODE_DCT558_=3 \
+	-D_MODE_DC586A_=4 \
+	-D_MODE_DC586A_=5 \
+	-D_MODE_GD581_=6
+    -D_MODE_DSC_=$(MODE_TYPE)

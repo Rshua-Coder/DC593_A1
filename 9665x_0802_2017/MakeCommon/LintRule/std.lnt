@@ -1,0 +1,9 @@
+//  Generic Compilers, -si4 -sp4, 
+//  Standard lint options
+
+
+//co.lnt
+co-ads.lnt
+-i"C:\Program Files\ARM\ADSv1_2\Include"
++libdir("C:\Program Files\ARM\ADSv1_2\Include")
+

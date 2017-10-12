@@ -1,0 +1,285 @@
+#ifndef UIFLOW_WND_PHOTO_PARAMS_H
+#define UIFLOW_WND_PHOTO_PARAMS_H
+
+
+#include "Type.h"
+#include "UIFramework.h"
+#include "UIGraphics.h"
+#include "KeyDef.h"
+
+
+
+//-----------------------------------------------------------------------------
+// Definitions
+//-----------------------------------------------------------------------------
+// Photo mode setting params list
+#define TOTAL_PHOTO_MODE                    (6 - 1)   // Without scene mode
+#define TOTAL_SCN_MODE                      24
+#define TOTAL_PHOTO_PARAMS_SETS             (TOTAL_PHOTO_MODE + TOTAL_SCN_MODE)
+#define PHOTOPARAMS_USER_DEFINED            0xFFFF
+
+
+#if (_QFUNC_UI_ == _QFUNC_UI_NEW_)
+// Photo mode type key mask
+#define PHOTO_AUTO_KEY_PRESS_MASK           FLGKEY_KEY_MASK_DEFAULT
+#define PHOTO_AUTO_KEY_RELEASE_MASK         FLGKEY_KEY_MASK_DEFAULT
+
+#define PHOTO_MANUAL_KEY_PRESS_MASK         FLGKEY_KEY_MASK_DEFAULT
+#define PHOTO_MANUAL_KEY_RELEASE_MASK       FLGKEY_KEY_MASK_DEFAULT
+
+#define PHOTO_PANORAMA_KEY_PRESS_MASK       (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT))
+#define PHOTO_PANORAMA_KEY_RELEASE_MASK     (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_PORTRAIT_KEY_PRESS_MASK       (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT))
+#define PHOTO_PORTRAIT_KEY_RELEASE_MASK     (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_STAB_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT))
+#define PHOTO_STAB_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+// Scene type key mask
+#define SCN_SPORTS_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) /*& (~FLGKEY_I)*/ & (~FLGKEY_LEFT) & (~FLGKEY_DOWN))
+#define SCN_SPORTS_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_INDOOR_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_LEFT) )
+#define SCN_INDOOR_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_SNOW_KEY_PRESS_MASK             (FLGKEY_KEY_MASK_DEFAULT   )
+#define SCN_SNOW_KEY_RELEASE_MASK           (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_FIREWORKS_KEY_PRESS_MASK        (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_RIGHT) /*& (~FLGKEY_I)*/   & (~FLGKEY_LEFT))
+#define SCN_FIREWORKS_KEY_RELEASE_MASK      (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_MUSEUM_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) /*& (~FLGKEY_I)*/  )
+#define SCN_MUSEUM_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_NIGHTLANDSCAPE_KEY_PRESS_MASK   (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) /*& (~FLGKEY_I)*/  & (~FLGKEY_LEFT)  )
+#define SCN_NIGHTLANDSCAPE_KEY_RELEASE_MASK (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_CHILDREN_KEY_PRESS_MASK         (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT) & (~FLGKEY_DOWN) )
+#define SCN_CHILDREN_KEY_RELEASE_MASK       (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_LEAF_KEY_PRESS_MASK             (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) /*& (~FLGKEY_I)*/  & (~FLGKEY_LEFT) )
+#define SCN_LEAF_KEY_RELEASE_MASK           (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_SUNSET_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT /*& (~FLGKEY_I)*/  & (~FLGKEY_LEFT)  )
+#define SCN_SUNSET_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_GLASS_KEY_PRESS_MASK            (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) /*& (~FLGKEY_I)*/  & (~FLGKEY_LEFT)  )
+#define SCN_GLASS_KEY_RELEASE_MASK          (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_LANDSCAPE_KEY_PRESS_MASK        (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) /*& (~FLGKEY_I)*/  & (~FLGKEY_LEFT)   )
+#define SCN_LANDSCAPE_KEY_RELEASE_MASK      (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_NIGHTPOTRAIT_KEY_PRESS_MASK     (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT) )
+#define SCN_NIGHTPOTRAIT_KEY_RELEASE_MASK   (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_BACKPORTRAIT_KEY_PRESS_MASK       (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_RIGHT)& (~FLGKEY_LEFT) )
+#define PHOTO_BACKPORTRAIT_KEY_RELEASE_MASK     (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_NIGHTPOTRAIT2_KEY_PRESS_MASK      (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT))
+#define PHOTO_NIGHTPOTRAIT2_KEY_RELEASE_MASK    (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_FLOWER_KEY_PRESS_MASK             (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT))
+#define PHOTO_FLOWER_KEY_RELEASE_MASK           (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_TEXT_KEY_PRESS_MASK               (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) & (~FLGKEY_I)  & (~FLGKEY_LEFT) & (~FLGKEY_DOWN))
+#define SCN_TEXT_KEY_RELEASE_MASK             (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_FISHEYE_KEY_PRESS_MASK            (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) & (~FLGKEY_I))
+#define SCN_FISHEYE_KEY_RELEASE_MASK          (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_ID_KEY_PRESS_MASK                 (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_I)   )
+#define SCN_ID_KEY_RELEASE_MASK               (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_PHOTOFRAME_KEY_PRESS_MASK         (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_UP))
+#define SCN_PHOTOFRAME_KEY_RELEASE_MASK       (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_PANNINGSHOT_KEY_PRESS_MASK        (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) /*& (~FLGKEY_I)*/ & (~FLGKEY_LEFT) & (~FLGKEY_DOWN)  )
+#define SCN_PANNINGSHOT_KEY_RELEASE_MASK      (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_BEACH_KEY_PRESS_MASK              (FLGKEY_KEY_MASK_DEFAULT)
+#define SCN_BEACH_KEY_RELEASE_MASK            (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_PARTY_KEY_PRESS_MASK              (FLGKEY_KEY_MASK_DEFAULT)
+#define SCN_PARTY_KEY_RELEASE_MASK            (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_SKETCH_KEY_PRESS_MASK             (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_I) )
+#define SCN_SKETCH_KEY_RELEASE_MASK           (FLGKEY_KEY_MASK_DEFAULT)
+
+#else     // mars3
+// Photo mode type key mask
+#define PHOTO_AUTO_KEY_PRESS_MASK           FLGKEY_KEY_MASK_DEFAULT
+#define PHOTO_AUTO_KEY_RELEASE_MASK         FLGKEY_KEY_MASK_DEFAULT
+
+#define PHOTO_MANUAL_KEY_PRESS_MASK         FLGKEY_KEY_MASK_DEFAULT
+#define PHOTO_MANUAL_KEY_RELEASE_MASK       FLGKEY_KEY_MASK_DEFAULT
+
+#define PHOTO_PANORAMA_KEY_PRESS_MASK       (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) )
+#define PHOTO_PANORAMA_KEY_RELEASE_MASK     (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_PORTRAIT_KEY_PRESS_MASK       (FLGKEY_KEY_MASK_DEFAULT )
+#define PHOTO_PORTRAIT_KEY_RELEASE_MASK     (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_STAB_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT )
+#define PHOTO_STAB_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+// Scene type key mask
+#define SCN_SPORTS_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT))
+#define SCN_SPORTS_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_INDOOR_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT  )
+#define SCN_INDOOR_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_SNOW_KEY_PRESS_MASK             (FLGKEY_KEY_MASK_DEFAULT   )
+#define SCN_SNOW_KEY_RELEASE_MASK           (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_FIREWORKS_KEY_PRESS_MASK        (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_LEFT))
+#define SCN_FIREWORKS_KEY_RELEASE_MASK      (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_MUSEUM_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_LEFT))
+#define SCN_MUSEUM_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_NIGHTLANDSCAPE_KEY_PRESS_MASK   (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_LEFT))
+#define SCN_NIGHTLANDSCAPE_KEY_RELEASE_MASK (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_CHILDREN_KEY_PRESS_MASK         (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_RIGHT)  )
+#define SCN_CHILDREN_KEY_RELEASE_MASK       (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_LEAF_KEY_PRESS_MASK             (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_LEFT))
+#define SCN_LEAF_KEY_RELEASE_MASK           (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_SUNSET_KEY_PRESS_MASK           (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_LEFT))
+#define SCN_SUNSET_KEY_RELEASE_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_GLASS_KEY_PRESS_MASK            (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_LEFT))
+#define SCN_GLASS_KEY_RELEASE_MASK          (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_LANDSCAPE_KEY_PRESS_MASK        (FLGKEY_KEY_MASK_DEFAULT  & (~FLGKEY_LEFT))
+#define SCN_LANDSCAPE_KEY_RELEASE_MASK      (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_NIGHTPOTRAIT_KEY_PRESS_MASK     (FLGKEY_KEY_MASK_DEFAULT  )
+#define SCN_NIGHTPOTRAIT_KEY_RELEASE_MASK   (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_BACKPORTRAIT_KEY_PRESS_MASK       (FLGKEY_KEY_MASK_DEFAULT  )
+#define PHOTO_BACKPORTRAIT_KEY_RELEASE_MASK     (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_NIGHTPOTRAIT2_KEY_PRESS_MASK      (FLGKEY_KEY_MASK_DEFAULT )
+#define PHOTO_NIGHTPOTRAIT2_KEY_RELEASE_MASK    (FLGKEY_KEY_MASK_DEFAULT)
+
+#define PHOTO_FLOWER_KEY_PRESS_MASK             (FLGKEY_KEY_MASK_DEFAULT)
+#define PHOTO_FLOWER_KEY_RELEASE_MASK           (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_TEXT_KEY_PRESS_MASK               (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT))
+#define SCN_TEXT_KEY_RELEASE_MASK             (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_FISHEYE_KEY_PRESS_MASK            (FLGKEY_KEY_MASK_DEFAULT)
+#define SCN_FISHEYE_KEY_RELEASE_MASK          (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_ID_KEY_PRESS_MASK                 (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_LEFT))
+#define SCN_ID_KEY_RELEASE_MASK               (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_PHOTOFRAME_KEY_PRESS_MASK         (FLGKEY_KEY_MASK_DEFAULT)
+#define SCN_PHOTOFRAME_KEY_RELEASE_MASK       (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_PANNINGSHOT_KEY_PRESS_MASK        (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_RIGHT) & (~FLGKEY_LEFT) )
+#define SCN_PANNINGSHOT_KEY_RELEASE_MASK      (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_BEACH_KEY_PRESS_MASK              (FLGKEY_KEY_MASK_DEFAULT)
+#define SCN_BEACH_KEY_RELEASE_MASK            (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_PARTY_KEY_PRESS_MASK              (FLGKEY_KEY_MASK_DEFAULT)
+#define SCN_PARTY_KEY_RELEASE_MASK            (FLGKEY_KEY_MASK_DEFAULT)
+
+#define SCN_SKETCH_KEY_PRESS_MASK             (FLGKEY_KEY_MASK_DEFAULT & (~FLGKEY_LEFT))
+#define SCN_SKETCH_KEY_RELEASE_MASK           (FLGKEY_KEY_MASK_DEFAULT)
+
+#endif
+
+#define RESET_ALL_KEY_PRESS_MASK            (FLGKEY_ENTER|FLGKEY_UP|FLGKEY_DOWN|FLGKEY_LEFT|FLGKEY_RIGHT/*|FLGKEY_MENU*/)
+extern UINT32 gResetAll;
+
+//-----------------------------------------------------------------------------
+// Photo Setting Params Info
+//-----------------------------------------------------------------------------
+typedef struct _UIPhotoSettingParamsInfo
+{
+    /*--- General ---*/
+    CHAR        *pNameString;
+    UINT32      uiDscModeType;
+    UINT32      uiSceneType;
+    UINT32      uiInitMaskKeyPress;
+    UINT32      uiInitMaskKeyRelease;
+
+    /*--- Flow ---*/
+    UINT16      uhIdxFlash;
+    UINT16      uhIdxMacro;
+    UINT16      uhIdxEV;
+    UINT16      uhIdxFD;
+    UINT16      uhIdxSelftimer;
+    UINT16      uhIdxContShotState;
+
+    /*--- Menu ---*/
+    UINT16      uhIdxAFWindow;
+    UINT16      uhIdxAFBeam;
+    UINT16      uhIdxMetering;
+    UINT16      uhIdxTimelapse;
+    UINT16      uhIdxContShot;
+    UINT32      uhIdxContAF;
+    UINT16      uhIdxGrid;
+    UINT16      uhIdxQReview;
+    UINT16      uhIdxPreview;
+    UINT16      uhIdxDzoomStatus;
+    UINT16      uhIdxHistogram;
+    UINT16      uhIdxSlowShutter;
+    UINT16      uhIdxDateImprint;
+    UINT16      uhIdxBlink;
+    UINT16      uhIdxBeep;
+    UINT16      uhIdxPhotoDisp;
+
+    /*--- Quick Func ---*/
+    UINT16      uhIdxColor;
+    UINT16      uhIdxSize;
+    UINT16      uhIdxQuality;
+    UINT16      uhIdxISO;
+    UINT16      uhIdxWB;
+
+    /*--- Hidden ---*/
+    UINT16      uhIdxSaturation;
+    UINT16      uhIdxSharpness;
+    UINT16      uhIdxContrast;
+
+    /*--- Menu Item Status ---*/
+    UINT32      uiMItemStAFWindow;
+    UINT32      uiMItemStAFBeam;
+    UINT32      uiMItemStMetering;
+    UINT32      uiMItemStContShot;
+    UINT32      uiMItemStContAF;
+    UINT32      uiMItemStGrid;
+    UINT32      uiMItemStQReview;
+    UINT32      uiMItemStDzoomStatus;
+    UINT32      uiMItemStHistogram;
+    UINT32      uiMItemStSlowShutter;
+    UINT32      uiMItemStDateImprint;
+    UINT32      uiMItemStBlink;
+    UINT32      uiMItemStPanDet;
+    UINT32      uiMItemStBeep;
+    /*--- Qfunc Item Status ---*/
+    UINT32      uiQItemStMacro;
+    UINT32      uiQItemStSelf;
+    UINT32      uiQItemStFlash;
+    UINT32      uiQItemStEV;
+    UINT32      uiQItemStContShot;
+    UINT32      uiQItemStSize;
+    /*--- Other Item Status ---*/
+    UINT32      uiSmileDetect;
+
+} UIPhotoSettingParamsInfo;
+
+
+extern UIPhotoSettingParamsInfo *GetPhotoParamsInfo(void);
+extern void SetPhotoParamsInfo(UIPhotoSettingParamsInfo *pInfo);
+extern void BackupPhotoParamsInfo(void);
+extern void RestorePhotoParamsInfo(void);
+extern /*const */UIPhotoSettingParamsInfo UIPhotoParams[TOTAL_PHOTO_PARAMS_SETS];
+
+#endif

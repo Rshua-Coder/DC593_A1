@@ -1,0 +1,226 @@
+// Please note -- this is a representative set of error suppression
+//                options.  Please adjust to suit your own policies
+//                See  manual (chapter LIVING WITH LINT)
+//                for further details.
+
+-D__LINT__=900
+
+//jeahyen add  - begin
+
+//config lib path
++libdir("\Include\Driver")
++libdir("\Include\Driver\Audio")
++libdir("\Include\Driver\Codec")
++libdir("\Include\Driver\CPU")
++libdir("\Include\Driver\Display")
++libdir("\Include\Driver\DMA")
++libdir("\Include\Driver\IO")
++libdir("\Include\Driver\IPP")
++libdir("\Include\Driver\Storage")
++libdir("\Include\Driver\SystemClk")
++libdir("\Include\Driver\Timer")
++libdir("\Include\Driver\Top")
++libdir("\Include\Driver\USB")
+
+-restore_at_end
+
+-passes(1)        // Execution PASS = 1
+//#NT#2015/09/07#Scottie -begin
+//#NT#Set Warning Level to 2: Error and Warning messages only
+//-w3               // Warning Level = 2
+-w2
+//#NT#Set Warning Level for processing library headers to 1: Error messages only (when processing library code.)
+-wlib(1)
+//#NT#2015/09/07#Scottie -end
+
+///////////////////////////////////////////////////////////
+
+//au-misra2.lnt     // apply MISRA 2004 config
+
+///////////////////////////////////////////////////////////
+
+//overwrite MISRA 2004 config
+-A(C99)           // strict ANSI C 1999
+-esym(950,"//")   // 允許使用單行註解符號
+//+fdi
+//+fim
++fie
+-D__align(x)      // 產生的大量error, 不認識armcc的 __align() keyword, 最後用這招避掉
+//-D__va_start(parmN)=((int*)0) //Error 64: Type mismatch (assignment) (int * = int), 不認識armcc的__va_start() API, 用這招避掉
+//-D__va_arg(ap,type)=(*(type*)(ap))  //Error 78: Symbol 'xxx' typedef'ed at line 'n', 不認識armcc的__va_arg() API, 用這招避掉
+//不認識armcc的__va_start(),__va_arg() API, 用這招避掉
+-emacro(78, va_start)
+-emacro(530, va_start)
+-emacro(732, va_start)
+-emacro(915, va_start)
+-emacro(920, va_start)
+-emacro(910, va_start)
+-emacro(960, va_start)
+-emacro(64, va_start)
+-emacro(78, va_arg)
+-emacro(530, va_arg)
+-emacro(732, va_arg)
+-emacro(915, va_arg)
+-emacro(920, va_arg)
+-emacro(910, va_arg)
+-emacro(960, va_arg)
+-emacro(64, va_arg)
+-esym(516, __va_start)
+-esym(526, __va_start)
+-esym(628, __va_start)
+-esym(718, __va_start)
+-esym(746, __va_start)
+-esym(732, __va_start)
+-esym(516, __va_arg)
+-esym(526, __va_arg)
+-esym(628, __va_arg)
+-esym(718, __va_arg)
+-esym(746, __va_arg)
+-esym(732, __va_arg)
+-D__asm=          // Error 10: Expecting identifier or other declarator, 不認識armcc的 __asm keyword, 用這招避掉
+-dnop=            // Error 40: Undeclared identifier 'nop' , 不認識armcc的 nop keyword, 用這招避掉
+-e505             // Warning 505: Redundant left argument to comma  <=== 很多UI Resource Data檔會觸犯這條, 此warning量多先關掉
+-elib(505)
+-e534             // Warning 534: Ignoring return value of function '[function]', 此warning量多先關掉
+-elib(534)
+-e537             // Warning 537: Repeated include file '[include file]', 此warning量多先關掉
+-elib(537)
+-e830             // Note 830: ... (輔助前一個Warning的額外行數資訊), 此note無用先關掉
+-elib(830)
+-e831             // Note 831: ... (輔助前一個Warning的額外行數資訊), 此note無用先關掉
+-elib(831)
+//jeahyen add  - end
+
+///////////////////////////////////////////////////////////
+
+//disable all 	w2 warning
+//-e4??
+//-elib(4??)
+//-e5??
+//-elib(5??)
+//-e6??
+//-elib(6??)
+//enable GS selected w2 warning
+//+e438
+//+elib(438)
+//+e514
+//+elib(514)
+//+e522
+//+elib(522)
+//+e524
+//+elib(524)
+//+e525
+//+elib(525)
+//+e526
+//+elib(526)
+//+e527
+//+elib(527)
+//+e545
+//+elib(545)
+//+e546
+//+elib(546)
+//+e550
+//+elib(550)
+//+e551
+//+elib(551)
+//+e552
+//+elib(552)
+//+e570
+//+elib(570)
+//+e572
+//+elib(572)
+//+e574
+//+elib(574)
+//+e613
+//+elib(613)
+//+e618
+//+elib(618)
+//+e644
+//+elib(644)
+//+e647
+//+elib(647)
+//+e650
+//+elib(650)
+//+e661
+//+elib(661)
+//+e662
+//+elib(662)
+//+e665
+//+elib(665)
+//+e666
+//+elib(666)
+//+e668
+//+elib(668)
+
+///////////////////////////////////////////////////////////
+//PC-Lint TURN OFF
+
+//Jeah request:
+
+//Warning 522: Highest operation, function 'xxx', lacks side-effects 
+-e522
+-elib(522)
+
+//Niven request:
+
+//Warning 613: Possible use of null pointer 'Symbol' in [left/right] argument to operator 'String' Reference
+-e613
+-elib(613)
+//Note 940: omitted braces within an initializer
+-e940
+-elib(940)
+//Note 960: Violates MISRA Year Required Rule Name, String
+-e960
+-elib(960)
+
+//#NT#2011/02/8#Jeah Yen -begin
+//allow to suppress Warning 572 for some "Get Raw Data" macro (in BinaryFormat.h)
+//Warning 572: Excessive shift value 
+-emacro(572, UINT32_Byte1)
+-emacro(572, UINT32_Byte2)
+-emacro(572, UINT32_Byte3)
+-emacro(572, UINT32_Byte4)
+-emacro(572, UINT32_HiWord)
+-emacro(572, UINT16_HiByte)
+-emacro(572, UINT32_SWAP)
+-emacro(572, UINT32_HiWord_SWAP)
+-emacro(572, UINT32_LoWord_SWAP)
+//#NT#2011/02/8#Jeah Yen -end
+
+//#NT#2015/09/07#Scottie -begin
+//#NT#Temporarily turn off some PC-Lint Error/Warning
+-e1*
+-e2
+-e26
+-e31
+-e38
+-e322
+-e4?
+-e409
+-e506
+-e514
+-e525
+-e526
+-e527
+-e539
+-e545
+-e546
+-e553
+-e560
+-e569
+-e570
+-e58
+-e585
+-e611
+-e618
+-e628
+-e63
+-e649
+-e659
+-e668
+-e7
+-e85
+-e91
+//#NT#2015/09/07#Scottie -end
+
+///////////////////////////////////////////////////////////

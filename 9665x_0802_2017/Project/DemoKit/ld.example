@@ -1,0 +1,45 @@
+mips-sde-elf-ld -o Loader650_Data/Release/Loader650.axf Loader650_Data/Release/ObjectCode/dramtest.o Loader650_Data/Release/ObjectCode/reset.o --entry=_start -EL -Ttext 0x80000000
+load_image D:/Project/650_Loader/Project/Model/Loader650_Data/Release/LD96650A.bin 0x80008000
+load_image D:/Project/Emu_650_new_arch/Project/DemoKit/650Demo_Data/Release/FW96650A.bin 0x80000000
+load_image D:/Project/Emu_650_new_arch/Project/DemoKit/650Demo_Data/Debug/FW96650A.bin 0x80000000
+
+
+load_image D:/Project/Emu_650_new_arch/Project/DemoKit/650Demo_Data/Release/FW96650A.bin 0x80000000
+dump_image D:/Project/Emu_650_new_arch/Project/DemoKit/650Demo_Data/release/FW96650A.bin 0x80000000 91192
+sde-insight --command=init.gdb Loader650.axf
+sde-insight --command=init.gdb 650Demo.axf
+sde-insight --command=init.gdb 650Demo_D.axf
+
+reg pc 0x80000250
+reg (可以看pc為多少)
+resume
+
+halt
+reset init
+load_image D:/Project/Emu_650_new_arch/Project/DemoKit/650Demo_Data/Release/FW96650A.bin 0x80000000
+reg pc 0x80000250
+resume
+
+halt
+reset init
+load_image D:/Project/Emu_650_new_arch/Project/DemoKit/650Demo_Data/Debug/FW96650A.bin 0x80000000
+reg pc 0x80000250
+resume
+
+halt
+reset init
+load_image D:/Project/Emu_650_new_arch/Project/DemoKit/650Demo_Data/Debug/FW96650A.bin 0x80000000
+reg pc 0x80000250
+resume
+
+halt
+reset init
+load_image D:/Project/Emu_650_DRV/Project/DemoKit/650Demo_Data/Debug/FW96650A.bin 0x80000000
+reg pc 0x80000250
+resume
+
+halt
+reset init
+load_image D:/Project/Emu_650_DRV/Project/DemoKit/650Demo_Data/Release/FW96650A.bin 0x80000000
+reg pc 0x80000250
+resume

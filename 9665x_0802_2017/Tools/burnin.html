@@ -1,0 +1,314 @@
+<html>
+<head>
+</head>
+
+<body>
+<script language="javascript">
+var version="1.00.00"
+    document.write("Version:" + version );
+
+</script>
+<BR>
+<input type ='button' value = 'RegularTest' onclick =RegularTest() style="width:150px;"></input>
+<input type ='button' value = 'RegularTestLoop' onclick =RegularTestLoop() style="width:150px;"></input>
+<input type ='button' value = 'StopRegularTestLoop' onclick =StopRegularTestLoop() style="width:150px;">  <BR>
+<input type ='button' value = 'ChangeMode' onclick =ChangeMode() style="width:150px;"></input>
+<input type ='button' value = 'ChangeModeLoop' onclick =ChangeModeLoop() style="width:150px;"></input>
+<input type ='button' value = 'StopChangeModeLoop' onclick =StopChangeModeLoop() style="width:150px;"></input>  <BR>
+<input type ='button' value = 'MovieRecord' onclick =MovieRecord() style="width:150px;"></input>
+<input type ='button' value = 'MovieRecordLoop' onclick =MovieRecordLoop() style="width:150px;"></input>
+<input type ='button' value = 'StopMovieRecordLoop' onclick =StopMovieRecordLoop() style="width:150px;"></input> <BR>
+<input type ='button' value = 'Capture' onclick =Capture() style="width:150px;"></input>
+<input type ='button' value = 'CaptureLoop' onclick =CaptureLoop() style="width:150px;"></input>
+<input type ='button' value = 'StopCaptureLoop' onclick =StopCaptureLoop() style="width:150px;"></input>  <BR>
+<input type ='button' value = 'ThumbOne' onclick = ExeFunction(ThumbOne,2000) style="width:150px;"></input>
+<input type ='button' value = 'ScreenOne' onclick = ExeFunction(ScreenOne,4000) style="width:150px;"></input>
+<input type ='button' value = 'DeleteOne' onclick = ExeFunction(DeleteOne,2000) style="width:150px;"></input> <BR>
+<script>
+
+var exeTime=0;
+var tid4=0;
+StartMovieRecordCmd =  "http://192.168.1.254/?custom=1&cmd=2001&par=1";
+StopMovieRecordCmd =  "http://192.168.1.254/?custom=1&cmd=2001&par=0";
+ChangePhotoCmd = "http://192.168.1.254/?custom=1&cmd=3001&par=0"
+ChangeMovieCmd = "http://192.168.1.254/?custom=1&cmd=3001&par=1"
+CaptureCmd = "http://192.168.1.254/?custom=1&cmd=1001"
+StartLviewCmd = "http://192.168.1.254/?custom=1&cmd=2015&par=1"
+StopLviewCmd = "http://192.168.1.254/?custom=1&cmd=2015&par=0"
+FormatCmd = "http://192.168.1.254/?custom=1&cmd=3010&par=1"
+ResetDefaultCmd = "http://192.168.1.254/?custom=1&cmd=3011"
+DateInPrintOnCmd = "http://192.168.1.254/?custom=1&cmd=2008&par=1"
+DateInPrintOffCmd = "http://192.168.1.254/?custom=1&cmd=2008&par=0"
+EV_P20Cmd = "http://192.168.1.254/?custom=1&cmd=2005&par=0"
+EV_P10Cmd = "http://192.168.1.254/?custom=1&cmd=2005&par=3"
+EV_00Cmd = "http://192.168.1.254/?custom=1&cmd=2005&par=6"
+EV_N10Cmd = "http://192.168.1.254/?custom=1&cmd=2005&par=9"
+EV_N20Cmd = "http://192.168.1.254/?custom=1&cmd=2005&par=12"
+AudioOnCmd = "http://192.168.1.254/?custom=1&cmd=2007&par=1"
+AudioOffCmd = "http://192.168.1.254/?custom=1&cmd=2007&par=0"
+CapSize0Cmd = "http://192.168.1.254/?custom=1&cmd=1002&par=0"
+CapSize1Cmd = "http://192.168.1.254/?custom=1&cmd=1002&par=1"
+CapSize2Cmd = "http://192.168.1.254/?custom=1&cmd=1002&par=2"
+CapSize3Cmd = "http://192.168.1.254/?custom=1&cmd=1002&par=3"
+CapSize4Cmd = "http://192.168.1.254/?custom=1&cmd=1002&par=4"
+CapSize5Cmd = "http://192.168.1.254/?custom=1&cmd=1002&par=5"
+MovieSize0Cmd = "http://192.168.1.254/?custom=1&cmd=2002&par=0"  //1080p
+MovieSize1Cmd = "http://192.168.1.254/?custom=1&cmd=2002&par=1"  //720p
+MovieSize2Cmd = "http://192.168.1.254/?custom=1&cmd=2002&par=2"  //WVGA
+MovieSize3Cmd = "http://192.168.1.254/?custom=1&cmd=2002&par=3"  //VGA
+LviewSize0Cmd = "http://192.168.1.254/?custom=1&cmd=2010&par=0"  //720p
+LviewSize1Cmd = "http://192.168.1.254/?custom=1&cmd=2010&par=1"  //WVGA
+LviewSize2Cmd = "http://192.168.1.254/?custom=1&cmd=2010&par=2"  //VGA
+LviewSize3Cmd = "http://192.168.1.254/?custom=1&cmd=2010&par=3"  //360P
+LviewSize4Cmd = "http://192.168.1.254/?custom=1&cmd=2010&par=4"  //QVGA
+HDROnCmd = "http://192.168.1.254/?custom=1&cmd=2004&par=1"
+HDROffCmd = "http://192.168.1.254/?custom=1&cmd=2004&par=0"
+DateCmd = "http://192.168.1.254/?custom=1&cmd=3005&str=2015-06-06"
+TimeCmd = "http://192.168.1.254/?custom=1&cmd=3006&str=06:06:06"
+FileListCmd = "http://192.168.1.254/?custom=1&cmd=3015"
+ThumbCmd = "?custom=1&cmd=4001"
+ScreenCmd = "?custom=1&cmd=4002"
+DeleteOneCmd = "http://192.168.1.254/?custom=1&cmd=4003&str="
+HttpCmd ="http://192.168.1.254/"
+
+
+
+String.prototype.replaceAt=function(index, str) {
+      return this.substr(0, index) + str + this.substr(index+1);
+   }
+
+
+
+function replaceFPATH(str){
+var first  = str.indexOf("\\");
+var next = str.indexOf("\\", first+1); 
+var nextnext = str.indexOf("\\", next+1); 
+var res=str.replaceAt(first,"\\\\");
+res=res.replaceAt(next+1,"\\\\");
+res=res.replaceAt(nextnext+2,"\\\\");
+return res;
+  }
+
+function XML_Nvt2ecosPath(inPath)
+{
+    var outPath =inPath;
+    outPath =outPath.replace("A:\\",HttpCmd);   
+    while (outPath.indexOf("\\") !=-1)
+    {
+			outPath =outPath.replace("\\","/");
+    }
+    //alert(outPath);
+		return outPath;
+}
+function GetPath(index){
+
+ var oRequest = new XMLHttpRequest();
+ var user;
+ var names=[];
+ 
+ oRequest.open("GET",FileListCmd,false);
+ oRequest.send()
+ /*
+  if (oRequest.status==200) alert(oRequest.responseText);
+ else alert("Error executing XMLHttpRequest call!");
+ */
+ var xml = oRequest.responseXML;
+
+ var users = xml.getElementsByTagName("File");
+ //alert(users.length);
+ user = users[index];
+ names = user.getElementsByTagName("FPATH"); 
+
+ str= names[0].childNodes[0].nodeValue;
+
+ //alert(str);
+ return str
+ 
+
+}
+
+function DeleteOne(){
+  var str =GetPath(0);
+  //path = replaceFPATH(str);
+  window.open(DeleteOneCmd+str,'c');
+}
+
+function ScreenOne(){
+  var str =GetPath(0);
+  var path = XML_Nvt2ecosPath(str);
+  window.open(path+ScreenCmd,'c');
+  //ExeCmd(path+ScreenCmd,3000);
+}
+
+function ThumbOne(){
+  var str =GetPath(0);
+  var path = XML_Nvt2ecosPath(str);
+  window.open(path+ThumbCmd,'c');
+  //ExeCmd(path+ThumbCmd,2000);
+}
+function Capture_Record(){
+
+	ExeCmd(ChangePhotoCmd,2000);
+	ExeCmd(CaptureCmd,2000);
+	ExeCmd(ChangeMovieCmd,2000);
+	ExeCmd(StartMovieRecordCmd,2000);
+	ExeCmd(StopMovieRecordCmd,4000);
+}
+function RegularTest()
+{
+	exeTime=0;
+	ExeCmd(StopLviewCmd,2000);
+	ExeCmd(FormatCmd,2000);
+	ExeCmd(ResetDefaultCmd,2000);
+	ExeCmd(DateCmd,2000);
+	ExeCmd(TimeCmd,2000);
+	ExeCmd(EV_P20Cmd,2000);
+	ExeCmd(DateInPrintOnCmd,2000);
+	ExeCmd(AudioOnCmd,2000);
+	ExeCmd(CapSize0Cmd,2000);
+	ExeCmd(MovieSize0Cmd,2000);
+	ExeCmd(LviewSize3Cmd,2000);
+	ExeCmd(StartLviewCmd,2000);
+
+	Capture_Record();
+
+	ExeFunction(ThumbOne,2000);
+	ExeFunction(ScreenOne,4000);
+	ExeFunction(DeleteOne,2000);
+	ExeCmd(StopLviewCmd,2000);
+	ExeCmd(EV_P10Cmd,2000);
+	ExeCmd(HDROnCmd,2000);
+	ExeCmd(CapSize1Cmd,2000);
+	ExeCmd(MovieSize1Cmd,2000);
+	ExeCmd(LviewSize0Cmd,2000);
+	ExeCmd(StartLviewCmd,2000);
+
+	Capture_Record();
+
+	ExeFunction(ThumbOne,2000);
+	ExeFunction(ScreenOne,4000);
+	ExeFunction(DeleteOne,2000);	
+	ExeCmd(StopLviewCmd,2000);
+	ExeCmd(EV_00Cmd,2000);
+	ExeCmd(HDROffCmd,2000);
+	ExeCmd(CapSize2Cmd,2000);
+	ExeCmd(MovieSize2Cmd,2000);
+	ExeCmd(LviewSize1Cmd,2000);
+	ExeCmd(StartLviewCmd,2000);
+
+	Capture_Record();
+
+	ExeFunction(ThumbOne,2000);
+	ExeFunction(ScreenOne,4000);
+	ExeFunction(DeleteOne,2000);	
+	ExeCmd(StopLviewCmd,2000);
+	ExeCmd(EV_N10Cmd,2000);
+	ExeCmd(DateInPrintOffCmd,2000);
+	ExeCmd(AudioOffCmd,2000);
+	ExeCmd(CapSize3Cmd,2000);
+	ExeCmd(MovieSize3Cmd,2000);
+	ExeCmd(LviewSize2Cmd,2000);
+	ExeCmd(StartLviewCmd,2000);
+
+	Capture_Record();
+
+	ExeFunction(ThumbOne,2000);
+	ExeFunction(ScreenOne,4000);
+	ExeFunction(DeleteOne,2000);	
+	ExeCmd(StopLviewCmd,2000);
+	ExeCmd(EV_N20Cmd,2000);
+	ExeCmd(CapSize4Cmd,2000);
+	ExeCmd(MovieSize0Cmd,2000);
+	ExeCmd(LviewSize3Cmd,2000);
+	ExeCmd(StartLviewCmd,2000);
+
+	Capture_Record();
+
+	ExeFunction(ThumbOne,2000);
+	ExeFunction(ScreenOne,4000);
+	ExeFunction(DeleteOne,2000);
+	ExeCmd(StopLviewCmd,2000);
+	ExeCmd(ResetDefaultCmd,2000);
+	ExeCmd(CapSize5Cmd,2000);
+	ExeCmd(MovieSize3Cmd,2000);
+	ExeCmd(LviewSize4Cmd,2000);
+	ExeCmd(StartLviewCmd,2000);
+
+	Capture_Record();
+	ExeFunction(ThumbOne,2000);
+	ExeFunction(ScreenOne,4000);
+	ExeFunction(DeleteOne,2000);	
+	
+}
+function RegularTestLoop()
+{
+	all = RegularTest();
+	alert(exeTime);
+	tid4=setInterval(RegularTest,212000);
+}
+function StopRegularTestLoop()
+{
+    clearInterval(tid4);
+}
+function ExeCmd(cmd,delay)
+{
+	exeTime+=delay;
+	setTimeout("window.open('"+cmd+"','b')",exeTime);
+}
+
+function ExeFunction(func,delay)
+{
+	exeTime+=delay;
+	//alert(exeTime);
+	setTimeout(func,exeTime);
+}
+
+function ChangeMode(){
+
+    window.open(ChangePhotoCmd,'c');
+    window.open(CaptureCmd,'d');
+    window.open(ChangeMovieCmd,'e');
+    setTimeout(MovieRecord,4000);
+}
+function MovieRecord(){
+	  window.open(StartMovieRecordCmd,'a');
+	  setTimeout("window.open(StopMovieRecordCmd,'b')",2000);
+}
+function Capture(){
+
+    window.open(ChangePhotoCmd,'c');
+    window.open(CaptureCmd,'d');
+    window.open(ChangeMovieCmd,'e');
+}
+function MovieRecordLoop()
+{
+	MovieRecord();
+    tid=setInterval(MovieRecord,4000);
+}
+function StopMovieRecordLoop()
+{
+    clearInterval(tid);
+}
+function ChangeModeLoop()
+{
+	ChangeMode();
+	tid2=setInterval(ChangeMode,7000);
+}
+function StopChangeModeLoop()
+{
+    clearInterval(tid2);
+}
+function CaptureLoop()
+{
+	Capture();
+	tid3=setInterval(Capture,4000);
+}
+function StopCaptureLoop()
+{
+    clearInterval(tid3);
+}
+
+
+</script>
+</body>
+</html>

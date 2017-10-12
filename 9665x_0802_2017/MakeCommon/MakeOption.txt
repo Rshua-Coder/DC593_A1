@@ -1,0 +1,217 @@
+ifeq "$(OPTION_LOADED)" ""
+
+#----------------------------------------------------------------------
+# Set option file loaded
+#----------------------------------------------------------------------
+export OPTION_LOADED := TRUE
+
+#----------------------------------------------------------------------
+# Set the Cross Compile target
+#
+# ARCH := ARM  'Use ARMv4 as target
+# ARCH := MIPS 'Use MIPS24Ke as target
+#----------------------------------------------------------------------
+#export ARCH := ARM
+export ARCH := MIPS
+
+#----------------------------------------------------------------------
+# Set branched project code
+#
+# The project code must be 4 characters, please refer to
+# http://mynvt.novatek.com.tw/deptsites/IM/Shared%20Documents/VersionControl.doc
+# for more detailed information.
+# Leaves this variable empty if not branched yet.
+#----------------------------------------------------------------------
+export _BRANCH_PROJECT_ := CW01
+
+#----------------------------------------------------------------------
+# PClint parameters
+#----------------------------------------------------------------------
+export PCLINT_PARAMETER := -b -v
+
+#----------------------------------------------------------------------
+# Set log file option
+#
+# ON    : Save warning/error message to log files
+# OFF   : Just output warning/error message to stdout
+#----------------------------------------------------------------------
+export LOG_ERR := ON
+#export LOG_ERR := OFF
+
+#----------------------------------------------------------------------
+# Set clean log file option
+#
+# ON    : Clean log files before make
+# OFF   : Don't clean log files before make
+#         (You should execute "make clean" to clean the log files)
+#----------------------------------------------------------------------
+export CLEAN_LOG := ON
+#export CLEAN_LOG := OFF
+
+#----------------------------------------------------------------------
+# Keep going when encounter error or not
+#
+# ON    : Make will keep going when encounter error
+# OFF   : Make will stop when encounter error
+#----------------------------------------------------------------------
+export KEEP_GOING := ON
+#export KEEP_GOING := OFF
+
+#----------------------------------------------------------------------
+# Isolate creating dependency files process
+#
+# ON    : You have to run "make dep" to create dependency files
+# OFF   : dependency file will be created when making the file
+#----------------------------------------------------------------------
+export ISOLATE_DEP := ON
+#export ISOLATE_DEP := OFF
+
+#----------------------------------------------------------------------
+# Generate debug symbol in release target
+# Release target won't generate debug symbol by default, if you want to
+# generate debug symbol in release target, please turn on this option
+#
+# ON    : Generate debug symbol in release target
+# OFF   : Don't generate debug symbol in release target (default value)
+#----------------------------------------------------------------------
+#export RELEASE_SYMBOL := ON
+export RELEASE_SYMBOL := OFF
+
+#----------------------------------------------------------------------
+# Generate debug callback of entry and exit to functions
+# Only support on MIPS (This is GCC Extension)
+# Reference: http://blog.linux.org.tw/~jserv/archives/001870.html
+#
+# ON    : Generate debug callback
+# OFF   : Don't generate debug callback (default value)
+#----------------------------------------------------------------------
+#export INSTRUMENT_FUNCTION := ON
+export INSTRUMENT_FUNCTION := OFF
+
+#----------------------------------------------------------------------
+# Generate one ELF section for each function
+# Compiler will generate one ELF section for one .c file by default.
+# If the .c file contains lots of function that are unused, turn on
+# this function can reduce code size.
+# (Linker will remove unused section by default)
+# Valid only in release target
+#
+# ON    : One ELF section for each function
+# OFF   : One ELF section for each .c file (default value of ADS/GNU C compiler)
+#----------------------------------------------------------------------
+export SECTION_BY_FUNC := ON
+#export SECTION_BY_FUNC := OFF
+
+#----------------------------------------------------------------------
+# Copy bin file to storage after bin file is created
+# You have to set an environment variable named "NVT_STG_PATH" (without
+# quote) to work with this function.
+# Example: set "NVT_STG_PATH" to "H:/" (without quote).
+#
+# ON    : Copy bin file to storage after bin file is created
+# OFF   : Don't copy bin file to storage after bin file is created
+#----------------------------------------------------------------------
+export COPY_BIN_2_STG := ON
+#export COPY_BIN_2_STG := OFF
+
+#----------------------------------------------------------------------
+# Select emulation or design-in (Release code) environment
+#
+# ON    : Emulation environment
+# OFF   : Design-in environment
+#----------------------------------------------------------------------
+#export EMULATION := ON
+export EMULATION := OFF
+
+#----------------------------------------------------------------------
+# Select FPGA or Realchip platform for emulation.
+# Valid only when EMULATION is ON
+#
+# ON    : FPGA platform
+# OFF   : Realchip platform
+#----------------------------------------------------------------------
+#export FPGA_EMULATION := ON
+export FPGA_EMULATION := OFF
+
+#----------------------------------------------------------------------
+# Set PLL OSC frequency for FPGA EMULATION
+# Valid only when FPGA_EMULATION is ON
+#
+# For example, you should set it to 27000000 if your FPGA is connected
+# with a 27 MHz OSC.
+#----------------------------------------------------------------------
+export FPGA_PLL_OSC := 24000000
+
+#----------------------------------------------------------------------
+# Set INCLUDE RULE
+#
+# ON    : Enable include rule checking of platform
+# OFF   : Disable include rule checking of platform
+#----------------------------------------------------------------------
+export INCLUDE_RULE := ON
+#export INCLUDE_RULE := OFF
+
+#----------------------------------------------------------------------
+# Use eCos kernel or uITRON kernel
+#
+# ON    : Use eCos kernel and light weight uITRON kernel compatible wrapper
+# OFF   : Use light weight uITRON kernel
+#----------------------------------------------------------------------
+export USE_ECOS_KERNEL := ON
+#export USE_ECOS_KERNEL := OFF
+
+#----------------------------------------------------------------------
+# Set the GCC MIPS parameters
+#----------------------------------------------------------------------
+ifeq "$(ARCH)" "MIPS"
+    CROSS_COMPILE      := mips-sde-elf-
+    export CC           = $(CROSS_COMPILE)gcc
+    export AS           = $(CROSS_COMPILE)as
+    export LD           = $(CROSS_COMPILE)ld
+    export AR           = $(CROSS_COMPILE)ar
+    export OBJDUMP      = $(CROSS_COMPILE)objdump
+    export FE           = $(CROSS_COMPILE)objcopy
+    export NM           = $(CROSS_COMPILE)nm
+    export LT           = "C:/lint/lint-nt.exe"
+    export GCC          = $(CROSS_COMPILE)gcc
+    export EBIN         = encrypt_bin
+    export BFC          = bfc
+    export LDNVT        = mips-nvt.exe
+endif
+
+#----------------------------------------------------------------------
+# Set the ADS ARM parameters
+#
+# The ARMCONF and ARMINC are the Windows environment variable. They
+# should be set by the install program of ARM ADS 1.2
+#
+# ARCH := ARM  'Use ARMv4 as target only where COMPILER is ADS
+#----------------------------------------------------------------------
+ifeq "$(ARCH)" "ARM"
+    TOOL_DIR           := $(subst \,/,$(ARMCONF))
+    export CC           = "$(TOOL_DIR)/armcc"
+    export AS           = "$(TOOL_DIR)/armasm"
+    export LD           = "$(TOOL_DIR)/armlink"
+    export AR           = "$(TOOL_DIR)/armar"
+    export FE           = "$(TOOL_DIR)/fromelf"
+    export LT           = "C:/lint/lint-nt.exe"
+    export GCC          = arm-gcc
+    export EBIN         = encrypt_bin
+    export BFC          = bfc
+    export ARMINC_DIR  := $(subst \,/,$(ARMINC))
+endif
+
+#----------------------------------------------------------------------
+# Set make flags
+#
+# Note: Don't modify this if you didn't add new option
+#----------------------------------------------------------------------
+# Slient mode
+MAKEFLAGS := s
+
+# Keep going or not
+ifeq "$(KEEP_GOING)" "ON"
+    MAKEFLAGS := $(MAKEFLAGS)k
+endif
+
+endif

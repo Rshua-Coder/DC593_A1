@@ -1,0 +1,37 @@
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysMain_Exe.c: In function 'System_OnShutdown':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysMain_Exe.c:290: warning: implicit declaration of function 'System_OnStrgInit_PS'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysMain_Exe.c:291: warning: implicit declaration of function 'DCT_FlowMovie_SetParkWakeUp'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c: In function 'System_OnVideoInit':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c:176: warning: implicit declaration of function 'View_Window_ConfigAttr'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c: In function 'AppView_EnableVideo':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c:341: warning: comparison between pointer and integer
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c: In function 'AppView_ChangeVideoMode':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c:394: warning: comparison between pointer and integer
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c: In function 'UI_EnableVideo':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c:430: warning: comparison between pointer and integer
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c: In function 'UI_ChangeVideoMode':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c:456: warning: comparison between pointer and integer
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c: In function 'UI_ShowJPG':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/System/SysVideo_Exe.c:1087: warning: unused variable 'GxImgFMT'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UI/UIGraphics.c: In function 'DCT_UI_Screen_Rotate':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UI/UIGraphics.c:548: warning: unused variable 'uiWidth'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UI/PhotoView.c: In function 'PhotoDisplay2_Update':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UI/PhotoView.c:240: warning: unused variable 'temp'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIMenu/UIMenuWiFi/UIMenuWndWiFiMobileLinkOK.c: In function 'UIMenuWndWiFiMobileLinkOK_OnOpen':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIMenu/UIMenuWiFi/UIMenuWndWiFiMobileLinkOK.c:212: warning: unused variable 'buf2'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIMenu/UIMenuWiFi/UIMenuWndWiFiMobileLinkOK.c:212: warning: unused variable 'buf1'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowCommon/UIFlowWndBatteryLow.c: In function 'UIFlowWndBatteryLow_OnTimer':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowCommon/UIFlowWndBatteryLow.c:96: warning: implicit declaration of function 'sprintf'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowCommon/UIFlowWndBatteryLow.c: In function 'UIFlowWndBatteryLow_Switch_OnKeyShutter2':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowCommon/UIFlowWndBatteryLow.c:242: warning: control reaches end of non-void function
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowCommon/UIFlowWndBatteryLow.c: In function 'UIFlowWndBatteryLow_OnTimer':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowCommon/UIFlowWndBatteryLow.c:109: warning: control reaches end of non-void function
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowMovie/UIFlowMovieFuncs.c: In function 'DCT_FlowMovie_ChangeFileLockState':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowMovie/UIFlowMovieFuncs.c:298: warning: implicit declaration of function 'MediaRec_SetCrash'
+_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowMovie/UIFlowWndMovie.c: In function 'UIFlowWndMovie_OnKeyMenu':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowMovie/UIFlowWndMovie.c:671: warning: unused variable 'iNextMode'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowMovie/UIFlowWndMovie.c:670: warning: unused variable 'iCurrMode'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowMovie/UIFlowWndMovie.c: In function 'UIFlowWndMovie_OnMovieOneSec':
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIWnd/DRIVER/UIFlow/UIFlowMovie/UIFlowWndMovie.c:1118: warning: implicit declaration of function 'MediaRec_SetCrash'
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIApp/Movie/UIAppMovie_3DNR.c:13: warning: 'iAE_AVG_old' defined but not used
+g:/NVT/DC593_A1/9665x_0802_2017/Project/DemoKit/SrcCode/UIApp/Movie/UIAppMovie_3DNR.c:14: warning: 'ui_KeepCnt' defined but not used

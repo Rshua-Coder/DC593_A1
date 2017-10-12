@@ -1,0 +1,260 @@
+#----------------------------------------------------------------------
+# Get the source full path, include directories
+#----------------------------------------------------------------------
+# query SRC, ASM, INC_DIR
+include $(MAKE_COMMON_DIR)/InputSource.txt
+
+#----------------------------------------------------------------------
+# Get setting from different architecture
+#----------------------------------------------------------------------
+include $(MAKE_COMMON_DIR)/MakeCommon_$(ARCH).txt
+
+# for coding rule of source code
+PCLINTFLAGS = $(PCLINT_PARAMETER) $(C_DEFINE_EXT) $(INC_DIR) -i$(MAKE_COMMON_DIR)/LintRule std.lnt options.lnt $$(lintopt_file)
+
+#----------------------------------------------------------------------
+# Definition for source code check build debug or release
+#----------------------------------------------------------------------
+CFLAGS_R += -DNDEBUG
+CFLAGS_D += -D_DEBUG
+
+#----------------------------------------------------------------------
+# FPGA notification for drivers
+#----------------------------------------------------------------------
+ifeq "$(EMULATION)" "ON"
+    ifeq "$(FPGA_EMULATION)" "ON"
+        CFLAGS_R += -D_EMULATION_=1 -D_FPGA_EMULATION_=1 -D_FPGA_PLL_OSC_=$(FPGA_PLL_OSC)
+        CFLAGS_D += -D_EMULATION_=1 -D_FPGA_EMULATION_=1 -D_FPGA_PLL_OSC_=$(FPGA_PLL_OSC)
+    else
+        CFLAGS_R += -D_EMULATION_=1 -D_FPGA_EMULATION_=0
+        CFLAGS_D += -D_EMULATION_=1 -D_FPGA_EMULATION_=0
+    endif
+else
+    CFLAGS_R += -D_EMULATION_=0 -D_FPGA_EMULATION_=0
+    CFLAGS_D += -D_EMULATION_=0 -D_FPGA_EMULATION_=0
+endif
+
+#----------------------------------------------------------------------
+# Definition from environment
+#----------------------------------------------------------------------
+CFLAGS_R += $(NMAKE_DEF)
+CFLAGS_D += $(NMAKE_DEF)
+
+#----------------------------------------------------------------------
+# Set image base directory according to kernel type
+# eCos      : /ARC
+# uITRON    : /ARC_eCos
+#----------------------------------------------------------------------
+ifeq "$(USE_ECOS_KERNEL)" "ON"
+    ifeq "$(OUTPUT_FILE)" "LIB"
+        # This is for library, project's image base directory is $(PRJ_NAME)_Data
+        # IMG_BASE_DIR looks like ../../ARC/Common (There is backslash succeeding to /ARC)
+        IMG_BASE_DIR := $(subst /ARC/,/ARC_eCos/,$(IMG_BASE_DIR))
+    endif
+    ifeq "$(OUTPUT_FILE)" "BIN"
+        # This is for project, library doesn't have this variable
+        # ARC_BASE_DIR looks like ../../ARC (There is No backslash succeeding to /ARC)
+        ARC_BASE_DIR := $(subst /ARC,/ARC_eCos,$(ARC_BASE_DIR))
+    endif
+    KERNEL_STR := eCos
+else
+    KERNEL_STR := uITRON
+endif
+
+#----------------------------------------------------------------------
+# Set branched project name
+#----------------------------------------------------------------------
+ifneq "$(_BRANCH_PROJECT_)" ""
+    CFLAGS_R += -D_PROJECT_CODE_=$(_BRANCH_PROJECT_)
+    CFLAGS_D += -D_PROJECT_CODE_=$(_BRANCH_PROJECT_)
+endif
+
+#----------------------------------------------------------------------
+# Set the directory for debug/release objects and images here
+#----------------------------------------------------------------------
+OBJ_DEBUG   = $(PRJ_NAME)_Data/Debug/ObjectCode
+OBJ_RELEASE = $(PRJ_NAME)_Data/Release/ObjectCode
+IMG_DEBUG   = $(IMG_BASE_DIR)/Debug
+IMG_RELEASE = $(IMG_BASE_DIR)/Release
+
+
+#----------------------------------------------------------------------
+# Filter the GCC Command Options for debug/release mode
+#----------------------------------------------------------------------
+FILTER_GCC_D = $(foreach v, $(CFLAGS_D), $(if $(findstring -D, $(v)), , $(v)))
+GCC_OPT_D    = $(filter-out $(INC_DIR), $(FILTER_GCC_D))
+FILTER_GCC_R = $(foreach v, $(CFLAGS_R), $(if $(findstring -D, $(v)), , $(v)))
+GCC_OPT_R    = $(filter-out $(INC_DIR), $(FILTER_GCC_R))
+
+
+#----------------------------------------------------------------------
+# Set the make outputs
+#----------------------------------------------------------------------
+SRC_OBJ_D := $(addprefix $(OBJ_DEBUG)/, $(notdir $(SRC:.c=.o)))
+ASM_OBJ_D := $(addprefix $(OBJ_DEBUG)/, $(notdir $(ASM:.s=.o)))
+ALL_OBJ_D := $(ASM_OBJ_D) $(SRC_OBJ_D)
+DEPFILE_D := $(subst .o,.d,$(ALL_OBJ_D))
+
+SRC_OBJ_R := $(addprefix $(OBJ_RELEASE)/, $(notdir $(SRC:.c=.o)))
+ASM_OBJ_R := $(addprefix $(OBJ_RELEASE)/, $(notdir $(ASM:.s=.o)))
+ALL_OBJ_R := $(ASM_OBJ_R) $(SRC_OBJ_R)
+DEPFILE_R := $(subst .o,.d,$(ALL_OBJ_R))
+
+ifeq "$(ISOLATE_DEP)" "ON"
+    ALL_DEP := $(DEPFILE_D) $(DEPFILE_R)
+endif
+
+LINT_ROOTDIR    = $(PRJ_NAME)_Lint
+LINT_DIR        = $(PRJ_NAME)_Lint/LintData
+LINT_FILE      := $(addprefix $(LINT_DIR)/, $(notdir $(SRC:.c=.lob)))
+
+#----------------------------------------------------------------------
+# Set the make targets
+#----------------------------------------------------------------------
+build_all: rm_log build_D build_R
+
+make_debug_begin:
+	@-echo \
+	&& echo Checking $(KERNEL_STR) - $(basename $(notdir $(IMAGE_D))) debug target ... \
+	&& mkdir -p $(IMG_DEBUG) $(OBJ_DEBUG)
+
+make_release_begin:
+	@-echo \
+	&& echo Checking $(KERNEL_STR) - $(basename $(notdir $(IMAGE_R))) release target ... \
+	&& mkdir -p $(IMG_RELEASE) $(OBJ_RELEASE)
+
+make_dep_begin:
+	@-echo Checking $(basename $(notdir $(IMAGE_R))) dependency ... \
+	&& mkdir -p $(OBJ_DEBUG) $(OBJ_RELEASE)
+
+make_lint_begin:
+	@-echo Checking \"$(basename $(notdir $(IMAGE_R)))\" with coding rules  ... \
+	&& mkdir -p $(LINT_DIR)
+
+make_option_begin:
+	@-echo [GCC Command Options - Release]
+	@-echo $(GCC_OPT_R)
+	@-echo
+	@-echo [GCC Command Options - Debug  ]
+	@-echo $(GCC_OPT_D)
+
+#----------------------------------------------------------------------
+# Compile rule functions
+#----------------------------------------------------------------------
+# $(call get_obj,obj_dir,source)
+get_obj = $(addprefix $1/, $(subst .c,.o,$(notdir $2)))
+
+# $(call get_obj_asm,obj_dir,source)
+get_obj_asm = $(addprefix $1/, $(subst .s,.o,$(notdir $2)))
+
+# $(call compile_all,obj_dir,cflags)
+define compile_all
+$(foreach i, $(SRC), \
+	$(call compile_rule,$(call get_obj,$1,$i),$i,$2))
+endef
+
+# $(call compile_all_asm,obj_dir,asmflags)
+define compile_all_asm
+$(foreach i, $(ASM), \
+	$(call compile_rule_asm,$(call get_obj_asm,$1,$i),$i,$2))
+endef
+
+#-----------------------------------------------------------------
+# Dependency rule functions
+#-----------------------------------------------------------------
+# $(call get_dep,dep_dir,source)
+get_dep = $(addprefix $1/, $(subst .c,.d,$(notdir $2)))
+
+# $(call get_dep_asm,dep_dir,source)
+get_dep_asm = $(addprefix $1/, $(subst .s,.d,$(notdir $2)))
+
+define depend_all
+$(foreach i, $(SRC), \
+	$(call depend_rule,$(call get_dep,$1,$i),$i))
+endef
+
+# $(call dep_all_asm,dep_dir)
+define depend_all_asm
+$(foreach i, $(ASM), \
+	$(call depend_rule_asm,$(call get_dep_asm,$1,$i),$i))
+endef
+
+#----------------------------------------------------------------------
+# LINT rule functions
+#----------------------------------------------------------------------
+# $(call get_lint,lint_dir,source)
+get_lint = $(addprefix $1/, $(subst .c,.lob,$(notdir $2)))
+
+# $(call lint_rule,output,source)
+define lint_rule
+$1: $2
+	@-echo Review $(notdir $2) \
+	&& $(LT) $(PCLINTFLAGS) -u -zero -oo[$1] $2 >> $$(lint_file)
+
+endef
+
+#	&& $(LT) $(PCLINTFLAGS) $2 >> $$(lint_file)
+
+define lint_all
+$1:
+$(foreach i, $(SRC), \
+	$(call lint_rule,$(call get_lint,$1,$i),$i))
+	@-echo Review \(Internal Relation\) \
+	&& $(LT) $(PCLINTFLAGS) $(LINT_DIR)/"*.lob" >> $$(lint_file)
+	-rm -rf --no-preserve-root $(LINT_ROOTDIR)
+
+endef
+
+#----------------------------------------------------------------------
+# Goals
+#----------------------------------------------------------------------
+ifeq "$(ISOLATE_DEP)" "ON"
+
+    ifeq "$(MAKECMDGOALS)" "dep"
+        $(eval $(call depend_all,$(OBJ_RELEASE)))
+        $(eval $(call depend_all_asm,$(OBJ_RELEASE)))
+        $(eval $(call depend_all,$(OBJ_DEBUG)))
+        $(eval $(call depend_all_asm,$(OBJ_DEBUG)))
+    endif
+
+    ifeq "$(MAKECMDGOALS)" ""
+        .DEFAULT_GOAL := all
+    endif
+
+else
+
+    ifeq "$(MAKECMDGOALS)" ""
+        -include $(DEPFILE_D)
+        -include $(DEPFILE_R)
+        $(eval $(call compile_all,$(OBJ_DEBUG),$(CFLAGS_D)))
+        $(eval $(call compile_all,$(OBJ_RELEASE),$(CFLAGS_R)))
+        $(eval $(call compile_all_asm,$(OBJ_DEBUG),$(ASMFLAGS_D)))
+        $(eval $(call compile_all_asm,$(OBJ_RELEASE),$(ASMFLAGS_R)))
+    endif
+
+    ifeq "$(MAKECMDGOALS)" "rebuild"
+        -include $(DEPFILE_D)
+        -include $(DEPFILE_R)
+        $(eval $(call compile_all,$(OBJ_DEBUG),$(CFLAGS_D)))
+        $(eval $(call compile_all,$(OBJ_RELEASE),$(CFLAGS_R)))
+        $(eval $(call compile_all_asm,$(OBJ_DEBUG),$(ASMFLAGS_D)))
+        $(eval $(call compile_all_asm,$(OBJ_RELEASE),$(ASMFLAGS_R)))
+    endif
+
+endif
+
+ifeq "$(MAKECMDGOALS)" "debug"
+    -include $(DEPFILE_D)
+    $(eval $(call compile_all,$(OBJ_DEBUG),$(CFLAGS_D)))
+    $(eval $(call compile_all_asm,$(OBJ_DEBUG),$(ASMFLAGS_D)))
+endif
+
+ifeq "$(MAKECMDGOALS)" "release"
+    -include $(DEPFILE_R)
+    $(eval $(call compile_all,$(OBJ_RELEASE),$(CFLAGS_R)))
+    $(eval $(call compile_all_asm,$(OBJ_RELEASE),$(ASMFLAGS_R)))
+endif
+
+ifeq "$(MAKECMDGOALS)" "lint"
+    $(eval $(call lint_all,$(LINT_DIR)))
+endif

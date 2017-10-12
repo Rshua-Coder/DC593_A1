@@ -1,0 +1,2 @@
+ACTIVE_PROJECT = DemoKit
+#ACTIVE_PROJECT = TestKit

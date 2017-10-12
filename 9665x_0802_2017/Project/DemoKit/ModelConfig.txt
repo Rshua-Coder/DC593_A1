@@ -1,0 +1,18 @@
+#----------------------------------------------------------------------
+# Set model here
+#----------------------------------------------------------------------
+MODEL = WIFICARDV
+#MODEL = DEMO1_EVB
+#MODEL = HTKW01
+#MODEL = B30W
+#MODEL = HDV02W
+#MODEL = CARDV_DUAL_NOCABLE
+#MODEL = CARDV_DUAL_TVP5150
+#MODEL = CARDV_DUAL
+#MODEL = DV658
+#MODEL = RAPOO_01
+#MODEL = IPCAM1_EVB
+#MODEL = CUBIC_MINI
+#MODEL = WD6
+#MODEL = C12
+#MODEL = CARDV_650

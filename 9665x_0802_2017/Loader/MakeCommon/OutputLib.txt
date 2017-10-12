@@ -1,0 +1,77 @@
+
+#----------------------------------------------------------------------
+# include make common and make option files
+#----------------------------------------------------------------------
+ifeq "$(OPTION_LOADED)" ""
+include $(MAKE_COMMON_DIR)/MakeOption.txt
+LOCAL_CLEAN_LOG = $(CLEAN_LOG)
+else
+LOCAL_CLEAN_LOG = OFF
+endif
+
+include $(MAKE_COMMON_DIR)/MakeCommon.txt
+
+#----------------------------------------------------------------------
+# set the make outputs
+#----------------------------------------------------------------------
+IMAGE_R = $(IMG_RELEASE)/$(PRJ_NAME).a
+
+#----------------------------------------------------------------------
+# set the warning/error log file option
+#----------------------------------------------------------------------
+MYPWD := $(shell pwd)
+LIB_PATH := $(findstring /LIB/, $(MYPWD))
+
+ifneq "$(LIB_PATH)" ""
+log_file := $(subst MakeCommon,LIB/log_Lib.txt,$(MAKE_COMMON_DIR))
+else
+log_file := /dev/null
+endif
+
+ifeq "$(LOG_ERR)" "ON"
+LOG_OPTION = 2>>$(log_file)
+LOG_DATE = date >>$(log_file)
+LOG_SPACE = echo >>$(log_file)
+endif
+
+#----------------------------------------------------------------------
+# set the make targets
+#----------------------------------------------------------------------
+build_R: make_release_begin $(IMAGE_R)
+ifeq "$(ISOLATE_DEP)" "ON"
+build_DEP: make_dep_begin $(ALL_DEP)
+endif
+
+$(IMAGE_R): $(ALL_OBJ_R)
+	@echo Creating library $(notdir $@) ... \
+	&& $(AR) -cru $@ $?
+
+.PHONY:
+rm_log:
+ifeq "$(LOCAL_CLEAN_LOG)" "ON"
+	@-rm -f $(log_file)
+endif
+
+clean:
+	@-echo Clean $(basename $(notdir $(IMAGE_R))) ... \
+	&& rm -rf $(PRJ_NAME)_Data $(IMAGE_R) $(log_file)
+
+#NT#2008/03/05#Chris Hsu -begin
+#NT#Add isolated dependency generating function
+ifeq "$(ISOLATE_DEP)" "ON"
+all: rm_log
+	@make dep
+	@make release
+
+rebuild:
+	@make clean
+	@make dep
+	@make release
+
+dep: build_DEP
+else
+rebuild: clean build_R
+endif
+#NT#2008/03/05#Chris Hsu -end
+
+release: rm_log build_R

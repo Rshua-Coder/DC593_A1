@@ -1,0 +1,1 @@
+../../ARC_eCos/Drv/Release/Driver_IPP.a ../../ARC_eCos/Drv/Release/Driver_Codec.a ../../ARC_eCos/Lib/Release/GxGfx.a ../../ARC_eCos/Lib/Release/GxStrg.a 

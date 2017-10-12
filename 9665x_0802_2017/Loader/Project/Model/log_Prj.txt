@@ -1,0 +1,2 @@
+<command-line>:0: warning: "_MODE_DC586A_" redefined
+<command-line>:0: note: this is the location of the previous definition

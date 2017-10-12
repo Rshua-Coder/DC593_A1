@@ -1,0 +1,263 @@
+
+#----------------------------------------------------------------------
+# include make common and make option files
+#----------------------------------------------------------------------
+ifeq "$(OPTION_LOADED)" ""
+include $(MAKE_COMMON_DIR)/MakeOption.txt
+endif
+include $(MAKE_COMMON_DIR)/MakeCommon.txt
+
+#----------------------------------------------------------------------
+# include the libraries
+#----------------------------------------------------------------------
+LIB_BASE_DIR_R = $(LIB_BASE_DIR)/Release
+
+OBJ_DIR = $(IMG_BASE_DIR)/Release/ObjectCode/
+
+# get LIBs in LIB module (general)
+LIB_COMMON_R            := $(wildcard $(LIB_BASE_DIR_R)/Common.a) $(wildcard $(LIB_BASE_DIR_R)/$(CPU_CORE).a)
+LIB_BOOT_R              := $(wildcard $(LIB_BASE_DIR_R)/Boot$(CHIP)$(CPUFREQ).a)
+LIB_COMPRESS_R	        := $(wildcard $(LIB_BASE_DIR_R)/Compress.a)
+
+# get LIBs in LIB module (option-included or chip-dependent)
+LIB_DRIVER_R            := $(wildcard $(LIB_BASE_DIR_R)/Driver650$(STORAGEINT)$(STORAGEEXT).a)
+LIB_RESET_R             := $(wildcard $(LIB_BASE_DIR_R)/Reset$(RESETFLAG).a)
+LIB_NAND_TBL_R			:= $(wildcard $(LIB_BASE_DIR_R)/Driver_Sys.a)
+
+# get total libraries
+LIB_R := \
+    $(LIB_COMMON_R)\
+    $(LIB_BOOT_R)\
+    $(LIB_DRIVER_R)\
+	$(LIB_RESET_R)\
+    $(LIB_COMPRESS_R)
+
+LD_START_ADDR = $(LD_BASE_ADDR)|0xA0000000
+LD_CONFIGRAM_ADDR = ($(LD_BASE_ADDR)|0xA0000000) + 0x30
+LD_NAND_TBL_INFO_ADDR = ($(LD_BASE_ADDR)|0xA0000000) + 0x220
+LD_DOREMAP_ADDR = ($(LD_BASE_ADDR)|0xA0000000) + 0x230
+LD_LOADER_EXEC_ADDR = ($(LD_BASE_ADDR)|0x80000000) + 0x4000
+LD_COMPRESS_PART_ADDR = ($(LD_BASE_ADDR)|0x80000000) + 0x5000
+
+#LD_START_ADDR = $(FW_MAX_CODE_SIZE)|0xA0000000
+#LD_CONFIGRAM_ADDR = ($(FW_MAX_CODE_SIZE)|0xA0000000) + 0x30
+#LD_DOREMAP_ADDR = ($(FW_MAX_CODE_SIZE)|0xA0000000) + 0x230
+#LD_COMPRESS_PART_ADDR = ($(FW_MAX_CODE_SIZE)|0x80000000) + 0x100000
+
+#----------------------------------------------------------------------
+# set the make outputs
+#----------------------------------------------------------------------
+# for release mode
+IMAGE_R = $(IMG_RELEASE)/$(PRJ_NAME).axf
+BIN_R = $(IMG_RELEASE)/$(BIN_NAME).bin
+TMP_R = $(IMG_RELEASE)/$(TMP_NAME).bin
+TMPCOMPRESSED_R = $(IMG_RELEASE)/$(TMP_NAME)LZ.bin
+MAP_R = $(IMG_RELEASE)/$(PRJ_NAME).txt
+SYM_R = $(IMG_RELEASE)/$(PRJ_NAME).sym
+
+#----------------------------------------------------------------------
+# set the warning/error log file option
+#----------------------------------------------------------------------
+log_file = log_Prj.txt
+
+ifeq "$(LOG_ERR)" "ON"
+LOG_OPTION = 2>>$(log_file)
+endif
+
+#----------------------------------------------------------------------
+# set the make targets
+#----------------------------------------------------------------------
+build_R: make_release_begin prepare_log $(IMAGE_R) $(BIN_R)
+ifeq "$(ISOLATE_DEP)" "ON"
+build_DEP: make_dep_begin $(SRC) $(ASM) $(ALL_DEP)
+endif
+ifeq "$(COMPILER)" "GCC"
+libgcc_path = $(shell $(CC) -print-libgcc-file-name)
+libgcc_dir = $(shell dirname "$(libgcc_path)")
+libgcc_dir_el = $(libgcc_dir)/el/sof
+LD_OBJS_D=$(shell grep "[a-zA-Z0-9]\.o" $(SCATTER_D) | sed 's/\.o.*/\.o/g' | sed 's/[ \t]*//g' | sort | uniq )
+LD_OBJS_R=$(shell grep "[a-zA-Z0-9]\.o" $(SCATTER_R) | sed 's/\.o.*/\.o/g' | sed 's/[ \t]*//g' | sort | uniq )
+LD_OBJS_D_NODIR=$(notdir $(LD_OBJS_D))
+LD_OBJS_R_NODIR=$(notdir $(LD_OBJS_R))
+#$(call gen_ld_objs, objs in ld script, all searched .a archive)
+define gen_ld_objs
+  @echo Extracting objs ...
+  $(foreach obj,$1, \
+  $(foreach lib,$2, \
+  $(shell $(AR) x $(lib) $(obj) 2>>1)))
+endef
+define gen_nand_objs
+  @echo Extracting objs for internal storage [$(STORAGEINT)]...
+  $(foreach obj,$1, \
+  $(foreach lib,$2, \
+  $(shell $(AR) x $(lib) $(obj) 2>>1)))
+endef
+endif
+build_CHK: make_chk_begin $(CHECK_FILE)
+
+prepare_log:
+	@$(LOG_OPTION)
+
+ifeq "$(COMPILER)" "ADS"
+$(IMAGE_R): $(SRC) $(ASM) $(ALL_OBJ_R) $(LIB_R) $(LIB_RESET_R)
+	@echo Linking ... \
+	&& echo Creating image ...$@\
+	&& $(LD) -o $@ $(ALL_OBJ_R) $(LIB_R) $(LIB_RESET_R)"(configram$(CHIP)$(RESETFLAG).o)" -info totals -entry reset$(CHIP).o -map -symbols -scatter $(SCATTER) -list $(MAP_R) -info sizes -keep configram$(CHIP)$(RESETFLAG).o $(LOG_OPTION)
+
+
+$(BIN_R): $(IMAGE_R)
+	@echo Creating executable $(TMP_R) ... \
+	&& $(FE) -output $(TMP_R) -bin $<
+	@echo Ver: $(BL_VERSION)
+ifeq "$(BL_COMPRESS)" "ENABLE"
+	@echo Compressing file $(TMP_R) $(@)\
+	&& $(BFC) c lz $(TMP_R) $(TMPCOMPRESSED_R) 1 $(UNCOMPRESSEDPART_SIZE_OFFSET)
+	@echo Encrypt binary file $@ for $(CHIP).... ->$(PHY_ANALOG_BLK)\
+	&& $(EBIN) $(TMPCOMPRESSED_R) $@ $(CHIP)
+	$(CFGRAM) $@ ../../Tools/ConfigRam/$(CHIP)_$(CHIP_VER)_$(DMA_CLOCK)_$(SDRAM_SIZE)$(DDR_FILE_STR).ini 650 $(LOADER_VERSION) $(CONFIG_RAM_GUI_EN) $(PHY_ANALOG_HV) $(DUTY_CALIBRATION) $(DUTY_CALIBRATION_LOG) $(DUTY_CALIBRATION_TYPE) $(LV1_CLK)
+	@$(CBIN) $@
+else
+	@echo Encrypt binary file $@ for $(CHIP)... \
+	&& $(EBIN) $(TMP_R) $@ $(CHIP)
+	$(CFGRAM) $@ ../../Tools/ConfigRam/$(CHIP)_$(CHIP_VER)_$(DMA_CLOCK)_$(SDRAM_SIZE)$(DDR_FILE_STR).ini 650 $(LOADER_VERSION) $(CONFIG_RAM_GUI_EN) $(PHY_ANALOG_HV) $(DUTY_CALIBRATION) $(DUTY_CALIBRATION_LOG) $(DUTY_CALIBRATION_TYPE) $(LV1_CLK)
+	@$(CBIN) $@
+endif
+endif
+
+ifeq "$(COMPILER)" "GCC"
+ifeq "$(STORAGEINT)" "NandEccRS"
+$(SCATTER_R) : $(SRC) $(ASM) $(ALL_OBJ_R) $(LIB_R)
+	@echo Modify link script for NAND support table ...
+	@echo 1.[$(_LOADER_NAND_SUPPORT_NAND_1st_)]
+	@echo 2.[$(_LOADER_NAND_SUPPORT_NAND_2nd_)]
+	@echo 3.[$(_LOADER_NAND_SUPPORT_NAND_3rd_)]	\
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_SUPPORT_NAND_1\*\/"/"\ \ \ \ \ \ \ \ \KEEP(\ Loader$(CHIP)_Data\/Release\/ObjectCode\/nand_tbl_$(_LOADER_NAND_SUPPORT_NAND_1st_).o(.data*))\ \/\*LOADER_SUPPORT_NAND_1\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_SUPPORT_NAND_2\*\/"/"\ \ \ \ \ \ \ \ \KEEP(\ Loader$(CHIP)_Data\/Release\/ObjectCode\/nand_tbl_$(_LOADER_NAND_SUPPORT_NAND_2nd_).o(.data*))\ \/\*LOADER_SUPPORT_NAND_2\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+  	&& cat $(SCATTER_R) | sed s/"^.*LOADER_SUPPORT_NAND_3\*\/"/"\ \ \ \ \ \ \ \ \KEEP(\ Loader$(CHIP)_Data\/Release\/ObjectCode\/nand_tbl_$(_LOADER_NAND_SUPPORT_NAND_3rd_).o(.data*))\ \/\*LOADER_SUPPORT_NAND_3\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*INTERNAL_STORAGE_VERSION\*\/"/"\ \ \ \ \ \ \ \ \KEEP(\ Loader$(CHIP)_Data\/Release\/ObjectCode\/nand_tbl_version.o(.data*))\ \/\*INTERNAL_STORAGE_VERSION\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+  	&& cat $(SCATTER_R) | sed s/"^.*INTERNAL_STORAGE_TYPE\*\/"/"\ \ \ \ .internal_stg_type\ $(LD_NAND_TBL_INFO_ADDR):\ {\ LONG\ \(0x444E414E\)\ }\ \/\*INTERNAL_STORAGE_TYPE\*\/"/ > scatter_tmp \
+	&& mv scatter_tmp $(SCATTER_R)
+$(SCATTER_R) : $(SRC) $(ASM) $(ALL_OBJ_R) $(LIB_R)
+$(IMAGE_R): $(SCATTER_R)
+	$(call gen_ld_objs,$(LD_OBJS_R_NODIR),$(LIB_R))
+	$(call gen_nand_objs,$(LD_OBJS_R_NODIR),$(LIB_NAND_TBL_R))
+	$(shell mv *.o $(IMG_BASE_DIR)/Release/ObjectCode 2>>1)
+	@echo Linking ... \
+	&& echo Creating image $@...\
+	&& cat $(SCATTER_R) | sed s/"^.*BOOT_EXEC_TAG\*\/"/"\ \ \ \ \.BOOT_EXEC\ $(LD_START_ADDR):\ \/\*BOOT_EXEC_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_CONFIGRAM_TAG\*\/"/"\ \ \ \ \.LOADER_CONFIGRAM\ $(LD_CONFIGRAM_ADDR):\ \/\*LOADER_CONFIGRAM_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_REMAP_TAG\*\/"/"\ \ \ \ \.LOADER_REMAP\ $(LD_DOREMAP_ADDR):\ \/\*LOADER_REMAP_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_EXEC_TAG\*\/"/"\ \ \ \ \.LOADER_EXEC\ $(LD_LOADER_EXEC_ADDR):\ \/\*LOADER_EXEC_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*COMPRESS_PART_TAG\*\/"/"\ \ \ \ \.text\ $(LD_COMPRESS_PART_ADDR):\ \/\*COMPRESS_PART_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& $(LD) -o $@ $(sort $(ALL_OBJ_R)) --start-group $(LIB_R) --end-group -Bstatic -EL --gc-sections -T $(SCATTER_R) -L "$(libgcc_dir_el)" -lgcc\
+	&& $(OBJDUMP) -x -h -t --disassemble-all -mmips:isa32r2 $@ > $(MAP_R)	\
+	&& $(NM) -n $@ > tmp_sym_r \
+	&& grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)' tmp_sym_r > $(SYM_R)\
+	&& rm -f tmp_sym_r
+$(BIN_R): $(IMAGE_R)
+	@echo Creating executable $(TMP_R) ...\
+	&& $(FE) --gap-fill=0xff -O binary $< $(TMP_R)
+ifeq "$(BL_COMPRESS)" "ENABLE"
+	@echo Compressing file $(TMP_R) $(@)\
+	&& $(BFC) c lz $(TMP_R) $(TMPCOMPRESSED_R) 1 $(UNCOMPRESSEDPART_SIZE_OFFSET)
+	@echo Encrypt binary file $@ for $(CHIP)...\
+	&& $(EBIN) $(TMPCOMPRESSED_R) $@ 650
+	$(CFGRAM) $@ ../../Tools/ConfigRam/$(CHIP)_$(CHIP_VER)_$(DMA_CLOCK)_$(SDRAM_SIZE)$(DDR_FILE_STR).ini 650 $(LOADER_VERSION) $(CONFIG_RAM_GUI_EN) $(PHY_ANALOG_HV) $(DUTY_CALIBRATION) $(DUTY_CALIBRATION_LOG) $(DUTY_CALIBRATION_TYPE) $(LV1_CLK)
+else
+	@echo Encrypt binary file $@ for $(CHIP)...\
+    && $(EBIN) $(TMP_R) $@ $(CHIP)
+endif
+else
+$(SCATTER_R) : $(SRC) $(ASM) $(ALL_OBJ_R) $(LIB_R)
+	@echo Modify link script for SPI flash ...\
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_SUPPORT_NAND_1\*\/"/"\ \ \ \ \ \ \ \ \/\*LOADER_SUPPORT_NAND_1\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_SUPPORT_NAND_2\*\/"/"\ \ \ \ \ \ \ \ \/\*LOADER_SUPPORT_NAND_2\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+  	&& cat $(SCATTER_R) | sed s/"^.*LOADER_SUPPORT_NAND_3\*\/"/"\ \ \ \ \ \ \ \ \/\*LOADER_SUPPORT_NAND_3\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*INTERNAL_STORAGE_VERSION\*\/"/"\ \ \ \ \ \ \ \ \KEEP(\ Loader$(CHIP)_Data\/Release\/ObjectCode\/nand_tbl_version.o(.data*))\ \/\*INTERNAL_STORAGE_VERSION\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+  	&& cat $(SCATTER_R) | sed s/"^.*INTERNAL_STORAGE_TYPE\*\/"/"\ \ \ \ .internal_stg_type\ $(LD_NAND_TBL_INFO_ADDR):\ {\ LONG\ \(0x46495053\)\ }\ \/\*INTERNAL_STORAGE_TYPE\*\/"/ > scatter_tmp \
+	&& mv scatter_tmp $(SCATTER_R)
+$(IMAGE_R):$(SCATTER_R)
+	$(call gen_ld_objs,$(LD_OBJS_R_NODIR),$(LIB_R))
+	$(call gen_nand_objs,$(LD_OBJS_R_NODIR),$(LIB_NAND_TBL_R))
+	$(shell mv *.o $(IMG_BASE_DIR)/Release/ObjectCode 2>>1)
+	@echo Linking ... \
+	&& echo Creating image $@...\
+	&& cat $(SCATTER_R) | sed s/"^.*BOOT_EXEC_TAG\*\/"/"\ \ \ \ \.BOOT_EXEC\ $(LD_START_ADDR):\ \/\*BOOT_EXEC_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_CONFIGRAM_TAG\*\/"/"\ \ \ \ \.LOADER_CONFIGRAM\ $(LD_CONFIGRAM_ADDR):\ \/\*LOADER_CONFIGRAM_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_REMAP_TAG\*\/"/"\ \ \ \ \.LOADER_REMAP\ $(LD_DOREMAP_ADDR):\ \/\*LOADER_REMAP_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*LOADER_EXEC_TAG\*\/"/"\ \ \ \ \.LOADER_EXEC\ $(LD_LOADER_EXEC_ADDR):\ \/\*LOADER_EXEC_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& cat $(SCATTER_R) | sed s/"^.*COMPRESS_PART_TAG\*\/"/"\ \ \ \ \.text\ $(LD_COMPRESS_PART_ADDR):\ \/\*COMPRESS_PART_TAG\*\/"/ > $(SCATTER_R)_tmp \
+	&& mv $(SCATTER_R)_tmp $(SCATTER_R) \
+	&& $(LD) -o $@ $(sort $(ALL_OBJ_R)) --start-group $(LIB_R) --end-group -Bstatic -EL --gc-sections -T $(SCATTER_R) -L "$(libgcc_dir_el)" -lgcc\
+	&& $(OBJDUMP) -x -h -t --disassemble-all -mmips:isa32r2 $@ > $(MAP_R)	\
+	&& $(NM) -n $@ > tmp_sym_r \
+	&& grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)' tmp_sym_r > $(SYM_R)\
+	&& rm -f tmp_sym_r
+$(BIN_R): $(IMAGE_R)
+	@echo Creating executable $(TMP_R) ...\
+	&& $(FE) --gap-fill=0xff -O binary $< $(TMP_R)
+ifeq "$(BL_COMPRESS)" "ENABLE"
+	@echo Compressing file $(TMP_R) $(@)\
+	&& $(BFC) c lz $(TMP_R) $(TMPCOMPRESSED_R) 1 $(UNCOMPRESSEDPART_SIZE_OFFSET)
+	@echo Encrypt binary file $@ for $(CHIP)... $(CHIP_VER) $(DMA_CLOCK) $(SDRAM_SIZE) $(LOADER_VERSION) $(CONFIG_RAM_GUI_EN) $(PHY_ANALOG_HV) $(DUTY_CALIBRATION) $(DUTY_CALIBRATION_LOG) $(DUTY_CALIBRATION_TYPE)\
+	&& $(EBIN) $(TMPCOMPRESSED_R) $@ 650
+	$(CFGRAM) $@ ../../Tools/ConfigRam/$(CHIP)_$(CHIP_VER)_$(DMA_CLOCK)_$(SDRAM_SIZE)$(DDR_FILE_STR).ini 650 $(LOADER_VERSION) $(CONFIG_RAM_GUI_EN) $(PHY_ANALOG_HV) $(DUTY_CALIBRATION) $(DUTY_CALIBRATION_LOG) $(DUTY_CALIBRATION_TYPE) $(LV1_CLK)
+else
+	@echo Encrypt binary file $@ for $(CHIP)...\
+    && $(EBIN) $(TMP_R) $@ $(CHIP)
+endif
+endif
+
+#&& $(EBIN) $(TMP_R) $@
+endif
+
+ifeq "$(COPY_BIN_2_STG)" "ON"
+ifneq "$(NVT_STG_PATH)" ""
+	@-echo Copy \""$(BIN_R)\"" to $(NVT_STG_PATH) ... \
+	&& cp -f $(BIN_R) $(NVT_STG_PATH)$(notdir $(BIN_R))
+endif
+endif
+
+.PHONY:
+rm_log:
+ifeq "$(CLEAN_LOG)" "ON"
+	@-rm -f $(log_file)
+endif
+
+clean:
+	@-echo Clean $(basename $(notdir $(IMAGE_R))) ... \
+	&& rm -rf $(IMG_BASE_DIR) $(log_file)
+
+ifeq "$(ISOLATE_DEP)" "ON"
+all: rm_log
+	@make dep
+	@make release
+
+rebuild:
+	@make clean
+	@make dep
+	@make release
+
+dep: build_DEP
+else
+rebuild: clean build_R
+endif
+
+release: rm_log build_R

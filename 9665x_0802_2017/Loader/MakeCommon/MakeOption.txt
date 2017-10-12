@@ -1,0 +1,193 @@
+#----------------------------------------------------------------------
+# Set the Cross Compile target
+#
+# ARCH := ARM  'Use ARMv4 as target
+# ARCH := MIPS 'Use MIPS24Ke as target
+#----------------------------------------------------------------------
+#export ARCH := ARM
+export ARCH := MIPS
+
+#----------------------------------------------------------------------
+# Set option file loaded
+#----------------------------------------------------------------------
+export OPTION_LOADED := TRUE
+
+#----------------------------------------------------------------------
+# Set log file option
+#
+# ON: Save warning/error message to log files
+# OFF: Just output warning/error message to stdout
+#----------------------------------------------------------------------
+export LOG_ERR := ON
+#export LOG_ERR := OFF
+
+#----------------------------------------------------------------------
+# Set clean log file option
+#
+# ON: Clean log files before make
+# OFF: Don't clean log files before make
+#      (You should execute "make clean" to clean the log files)
+#----------------------------------------------------------------------
+export CLEAN_LOG := ON
+#export CLEAN_LOG := OFF
+
+#----------------------------------------------------------------------
+# Keep going when encounter error or not
+#
+# ON: Make will keep going when encounter error
+# OFF: Make will stop when encounter error
+#----------------------------------------------------------------------
+#export KEEP_GOING := ON
+export KEEP_GOING := OFF
+
+#----------------------------------------------------------------------
+# Isolate creating dependency files process
+#
+# ON: You have to run "make dep" to create dependency files
+# OFF: dependency file will be created when making the file
+#----------------------------------------------------------------------
+export ISOLATE_DEP := ON
+#export ISOLATE_DEP := OFF
+
+#----------------------------------------------------------------------
+# Generate debug symbol in release target
+# Release target won't generate debug symbol by default, if you want to
+# generate debug symbol in release target, please turn on this option
+#
+# ON: Generate debug symbol in release target
+# OFF: Don't generate debug symbol in release target (default value)
+#----------------------------------------------------------------------
+#export RELEASE_SYMBOL := ON
+export RELEASE_SYMBOL := OFF
+
+#----------------------------------------------------------------------
+# Generate one ELF section for each function
+# Compiler will generate one ELF section for one .c file by default.
+# If the .c file contains lots of function that are unused, turn on
+# this function can reduce code size.
+# (Linker will remove unused section by default)
+#
+# ON: One ELF section for each function
+# OFF: One ELF section for each .c file (default value of ADS C compiler)
+#----------------------------------------------------------------------
+export SECTION_BY_FUNC := ON
+#export SECTION_BY_FUNC := OFF
+
+#----------------------------------------------------------------------
+# enable or disable the assert function
+#----------------------------------------------------------------------
+#export USING_ASSERT := ON
+export USING_ASSERT := OFF
+
+#----------------------------------------------------------------------
+# Copy bin file to storage after bin file is created
+# You have to set an environment variable named "NVT_STG_PATH" (without
+# quote) to work with this function.
+# Example: set "NVT_STG_PATH" to "H:/" (without quote).
+#
+# ON: Copy bin file to storage after bin file is created
+# OFF: Don't copy bin file to storage after bin file is created
+#----------------------------------------------------------------------
+#export COPY_BIN_2_STG := ON
+export COPY_BIN_2_STG := OFF
+
+#----------------------------------------------------------------------
+# SET FPGA EMULATION MACRO for FPGA/realchip dependency module
+#
+# ON: FPGA platform
+# OFF: realchip platform
+#----------------------------------------------------------------------
+export FPGA_EMULATION := ON
+#export FPGA_EMULATION := OFF
+#----------------------------------------------------------------------
+# SET PLL OSC frequency for FPGA EMULATION
+# (only valid when FPGA_EMULATION == ON)
+#
+# For example, you should set it to 27000000 if your FPGA is connected
+# with a 27Mhz OSC.
+#----------------------------------------------------------------------
+export FPGA_PLL_OSC := 27000000
+
+#----------------------------------------------------------------------
+# Set the dump encrypt binary tool
+#
+# ARCH := ARM  'Use ARMv4 as target
+# ARCH := MIPS 'Use MIPS24Ke as target
+#----------------------------------------------------------------------
+export ENCRYPT_DUMP := ON
+#export ENCRYPT_DUMP := OFF
+
+#----------------------------------------------------------------------
+# Set the GCC MIPS parameters
+#----------------------------------------------------------------------
+ifeq "$(ARCH)" "MIPS"
+export COMPILER := GCC
+endif
+ifeq "$(ARCH)" "ARM"
+export COMPILER := ADS
+endif
+
+ifeq "$(COMPILER)" "GCC"
+CROSS_COMPILE := mips-sde-elf-
+export CC = $(CROSS_COMPILE)gcc
+export AS = $(CROSS_COMPILE)as
+export LD = $(CROSS_COMPILE)ld
+export AR = $(CROSS_COMPILE)ar
+export OBJDUMP = $(CROSS_COMPILE)objdump
+export FE = $(CROSS_COMPILE)objcopy
+export NM = $(CROSS_COMPILE)nm
+export SP = splint
+export LT = "C:/lint/lint-nt.exe"
+export GCC = $(CROSS_COMPILE)gcc
+ifeq "$(ENCRYPT_DUMP)" "ON"
+export EBIN = ../../Tools/Bin/encrypt_boot_dump.exe
+else
+export EBIN = ../../Tools/Bin/encrypt_boot.exe
+endif
+export BFC = ../../Tools/Bin/bfc
+export CFGRAM = ../../Tools/Bin/Configram
+export ARMINC_DIR :=
+endif
+
+#----------------------------------------------------------------------
+# Set the ADS ARM parameters
+#
+# The ARMCONF and ARMINC are the Windows environment variable. They
+# should be set by the install program of ARM ADS 1.2
+#
+# ARCH := ARM  'Use ARMv4 as target only where COMPILER is ADS
+#----------------------------------------------------------------------
+ifeq "$(ARCH)" "ARM"
+CROSS_COMPILE := arm-none-eabi-
+#CROSS_COMPILE := arm-uclinuxeabi-
+#CROSS_COMPILE := arm-elf-
+PLATFORM_CFLAGS= -march=armv4 -mapcs -mno-thumb-interwork -mno-sched-prolog -msoft-float
+PLATFORM_AFLAGS= -march=armv4
+PLATFORM_CFLAGS= -cpu 4 -li
+PLATFORM_AFLAGS= -cpu 4 -fpu None -li
+TOOL_DIR := $(subst \,/,$(ARMCONF))
+export CC = "$(TOOL_DIR)/armcc"
+export AS = "$(TOOL_DIR)/armasm"
+export LD = "$(TOOL_DIR)/armlink"
+export AR = "$(TOOL_DIR)/armar"
+export FE = "$(TOOL_DIR)/fromelf"
+export SP = splint
+export LT = "C:/lint/lint-nt.exe"
+export GCC = arm-gcc
+export EBIN = encrypt_bin
+export BFC = bfc
+export ARMINC_DIR := $(subst \,/,$(ARMINC))
+endif
+
+#----------------------------------------------------------------------
+# Set make flags
+#
+# Note: Don't modify this if you didn't add new option
+#----------------------------------------------------------------------
+# Slient mode
+MAKEFLAGS := s
+
+# Keep going or not
+ifeq "$(KEEP_GOING)" "ON"
+MAKEFLAGS := $(MAKEFLAGS)k
+endif

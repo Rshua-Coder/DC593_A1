@@ -1,0 +1,16 @@
+---- UI_BeginScreen Matches (15 in 6 files) ----
+IPL_Cal_KeyStrSample.c (project\demokit\srccode\engineer\calsensor\ui_sample):    pCalDCList = (DC**)UI_BeginScreen();
+IPL_Cal_KeyStrSample.c (project\demokit\srccode\engineer\calsensor\ui_sample):    pDCList = (DC**)UI_BeginScreen();
+SensorFP.c (project\demokit\srccode\uiapp):    pDCList = (DC**)UI_BeginScreen();
+SensorFP.c (project\demokit\srccode\uiapp):    pDCList = (DC**)UI_BeginScreen();
+SysPower_Exe.c (project\demokit\srccode\system):        pDCList = (DC**)UI_BeginScreen();
+UIDisplay.h (project\demokit\srccode\ui):#define SHOWCMD_BEGINDRAW   1 //<<< UI_BeginScreen(),UI_BeginShow(): prepare buffer
+UIGraphics.c (project\demokit\srccode\ui):UIScreen UI_BeginScreen(void)
+UIGraphics.c (project\demokit\srccode\ui):    UI_BeginScreen,
+UIGraphics.c (project\demokit\srccode\ui):        pDCList = (DC**)UI_BeginScreen();
+UIGraphics.c (project\demokit\srccode\ui):        pDCList = (DC**)UI_BeginScreen();
+UIGraphics.c (project\demokit\srccode\ui):    pDCList = (DC**)UI_BeginScreen();
+UIGraphics.c (project\demokit\srccode\ui):    pDCList = (DC**)UI_BeginScreen();
+UIGraphics.c (project\demokit\srccode\ui):    pDCList = (DC**)UI_BeginScreen();
+UIGraphics.c (project\demokit\srccode\ui):    pDCList = (DC**)UI_BeginScreen();
+UIGraphics.h (project\demokit\srccode\ui):extern UINT32 UI_BeginScreen(void);

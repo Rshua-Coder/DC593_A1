@@ -1,0 +1,903 @@
+DSC_FW  0x0
+{
+    ; Special RO is the exception table, version info and clock API that will be
+    ; lock in cache
+    SPECIAL_RO +0x0
+    {
+        Startup.o (+RO, +FIRST)
+        VersionInfo.o (+RO)
+    }
+
+    SPECIAL_CLOCK_RW +0x0
+    {
+        Clock.o (+RW)
+    }
+
+    SPECIAL_CLOCK_RO +0x0
+    {
+        ClockAPI.o (+RO, +FIRST)
+        Clock.o (+RO-CODE)
+        Clock.o (+RO-DATA, +LAST)
+    }
+    RTOS_KERNEL_RO +0x0
+    {
+; To Check the Kernel RO and RW
+; using the key word --;K;-- and Editor Function "Replace to space"
+        IntHnder.o    (+RO)
+        Kcenque.o     (+RO)
+;K;        KCHGPTY.o     (+RO)
+        KCHK_FLG.o    (+RO)
+        KCLR_FLG.o    (+RO)
+        KCSUSPD.o     (+RO)
+        Kdef_int.o    (+RO)
+        Kdis_int.o    (+RO)
+        Kena_int.o    (+RO)
+        ker.o         (+RO)
+        KerVerInfo.o  (+RO)
+        KEXT_TSK.o    (+RO)
+        KGET_BLFSIZ.o (+RO)
+        KGET_TID.o    (+RO)
+        KICR_FLG.o    (+RO)
+        KICR_MBX.o    (+RO)
+        KICR_MPF.o    (+RO)
+        KICR_SEM.o    (+RO)
+        KICR_TSK.o    (+RO)
+        KINI_FLG.o    (+RO)
+        KINI_MBX.o    (+RO)
+        KINI_MPF.o    (+RO)
+        KINI_SEM.o    (+RO)
+        KINI_TCB.o    (+RO)
+        KREL_BLF.o    (+RO)
+;K;        KRSM_TSK.o    (+RO)
+        KSET_FLG.o    (+RO)
+        KSIG_SEM.o    (+RO)
+        KSND_MSG.o    (+RO)
+        KSRESUM.o     (+RO)
+        KSTA_TSK.o    (+RO)
+;K;        KSUS_TSK.o    (+RO)
+        KTCV_MSG.o    (+RO)
+        KTER_TSK.o    (+RO)
+        KTGT_BLF.o    (+RO)
+;K;        KTSERVC.o     (+RO)
+        KTWI_FLG.o    (+RO)
+        KTWI_SEM.o    (+RO)
+        Scheduler.o   (+RO)
+        KLOC_CPU.o    (+RO)
+        KUNL_CPU.o    (+RO)
+;Debug
+        Debug.o         (+RO)
+        Debug_DumpKer.o (+RO)
+    }
+    RTOS_KERNEL_RW +0x0
+    {
+;K;        IntHnder.o    (+RW)
+;K;        Kcenque.o     (+RW)
+;K;        KCHGPTY.o     (+RW)
+;K;        KCHK_FLG.o    (+RW)
+;K;        KCLR_FLG.o    (+RW)
+;K;        KCSUSPD.o     (+RW)
+;K;        Kdef_int.o    (+RW)
+;K;        Kdis_int.o    (+RW)
+;K;        Kena_int.o    (+RW)
+        ker.o         (+RW)
+        KerVerInfo.o  (+RW)
+;K;        KEXT_TSK.o    (+RW)
+;K;        KGET_BLFSIZ.o (+RW)
+;K;        KGET_TID.o    (+RW)
+;K;        KICR_FLG.o    (+RW)
+;K;        KICR_MBX.o    (+RW)
+;K;        KICR_MPF.o    (+RW)
+;K;        KICR_SEM.o    (+RW)
+;K;        KICR_TSK.o    (+RW)
+;K;        KINI_FLG.o    (+RW)
+;K;        KINI_MBX.o    (+RW)
+;K;        KINI_MPF.o    (+RW)
+;K;        KINI_SEM.o    (+RW)
+;K;        KINI_TCB.o    (+RW)
+;K;        KREL_BLF.o    (+RW)
+;K;        KRSM_TSK.o    (+RW)
+;K;        KSET_FLG.o    (+RW)
+;K;        KSIG_SEM.o    (+RW)
+;K;        KSND_MSG.o    (+RW)
+;K;        KSRESUM.o     (+RW)
+;K;        KSTA_TSK.o    (+RW)
+;K;        KSUS_TSK.o    (+RW)
+;K;        KTCV_MSG.o    (+RW)
+;K;        KTER_TSK.o    (+RW)
+;K;        KTGT_BLF.o    (+RW)
+;K;        KTSERVC.o     (+RW)
+;K;        KTWI_FLG.o    (+RW)
+;K;        KTWI_SEM.o    (+RW)
+;K;        Scheduler.o   (+RW)
+;K;        KLOC_CPU.o    (+RW)
+;K;        KUNL_CPU.o    (+RW)
+; Debug
+        Debug.o         (+RW)
+        Debug_DumpKer.o (+RW)
+    }
+    START_UP_RO +0x0
+    {
+; The object codes that don't have any RO section are marked to prevent linker warning
+; If you modify any code below, make sure to check these configuration again.
+; Standard C library
+        *.l                    (+RO)
+        Loader.o               (+RO)
+        InitCLibMMU.o          (+RO)
+        Main.o                 (+RO)
+        StartKer.o             (+RO)
+        DATKER.o               (+RO)
+        OSCommon.o             (+RO)
+        KerInit.o              (+RO)
+        INITSK.o               (+RO)
+        SystemInit.o           (+RO)
+        SystemTask.o           (+RO)
+        ;SystemClock.o          (+RO)
+        SystemState.o          (+RO)
+        scf_section.o          (+RO)
+        GxStorage_FWDownload.o (+RO)
+        GxSysCfg.o             (+RO)
+        Cache.o                (+RO)
+        Interrupt.o            (+RO)
+        Uart.o                 (+RO)
+    }
+    START_UP_RW +0x0
+    {
+; The object codes that don't have any RW section are marked to prevent linker warning
+; If you modify any code below, make sure to check these configuration again.
+; Standard C library
+        *.l                    (+RW)
+        Loader.o               (+RW)
+        InitCLibMMU.o          (+RW)
+        Main.o                 (+RW)
+        StartKer.o             (+RW)
+        DATKER.o               (+RW)
+        OSCommon.o             (+RW)
+        KerInit.o              (+RW)
+        INITSK.o               (+RW)
+        SystemInit.o           (+RW)
+        SystemTask.o           (+RW)
+        ;SystemClock.o          (+RW)
+        SystemState.o          (+RW)
+        scf_section.o          (+RW)
+        GxStorage_FWDownload.o (+RW)
+        GxSysCfg.o             (+RW)
+        Cache.o                (+RW)
+        Interrupt.o            (+RW)
+        Uart.o                 (+RW)
+    }
+    PART_ONE_RO +0x0
+    {
+; Driver
+        DrvCommon.o            (+RO)
+        ;Interrupt.o            (+RO)
+        NAND.o                 (+RO)
+        nand_host.o            (+RO)
+        NAND_PS.o              (+RO)
+        PLL.o                  (+RO)
+        SDIO.o                 (+RO)
+        SDIOII.o               (+RO)
+        Top.o                  (+RO)
+        Amba.o                 (+RO)
+        DMA.o                  (+RO)
+        ;Cache.o                (+RO)
+        GPIO.o                 (+RO)
+        Pad.o                  (+RO)
+        SIF.o                  (+RO)
+        ;Uart.o                 (+RO)
+        ADC.o                  (+RO)
+        Timer.o                (+RO)
+        RTC.o                  (+RO)
+        PWM.o                  (+RO)
+        Delay.o                (+RO)
+        JPEG.o                 (+RO)
+        jpeg_int.o             (+RO)
+        ide.o                  (+RO)
+        ide_lib.o              (+RO)
+        ide_compat.o           (+RO)
+        ide_osd.o              (+RO)
+        ide_video.o            (+RO)
+        ide_tv.o               (+RO)
+        dai.o                  (+RO)
+        eac.o                  (+RO)
+        Wdt.o                  (+RO)
+        DrvVerInfo.o           (+RO)
+        DrvVerInfo_IPP.o       (+RO)
+        DrvVerInfo_codec.o     (+RO)
+        lz.o                   (+RO);UnCompress function
+        DxCommon.o             (+RO)
+; Project PowerOn CB
+        SysCfg.o (+RO)              ;Project Code
+        SysArch.o (+RO)             ;Project Code
+        SysCB.o (+RO)               ;Project Code
+        SysUtility.o (+RO)          ;Project Code
+        SysSpeed.o (+RO)            ;Project Code
+        SysMemory.o (+RO)           ;Project Code
+        SysTask.o (+RO)             ;Project Code
+        SysMode.o (+RO)             ;Project Code
+; POWERON_CB_START   
+        TM_Mark.o (+RO)             ;Lib
+        Perf.o (+RO)                ;Lib
+        GxStorage.o (+RO)           ;Lib
+        GxPower.o (+RO)             ;Lib
+        GxKey_p1.o  (+RO)           ;Lib
+        GxKey.o  (+RO)              ;Lib
+        GxLED.o (+RO)               ;Lib
+        GxFile_p1.o (+RO)           ;Lib
+        GxTimer_p1.o (+RO)          ;Lib
+        GPIOMapping.o (+RO)         ;Custom Driver
+        VoltageDet.o (+RO)          ;Custom Driver
+        DxPower_Battery.o (+RO)     ;Custom Driver
+        DxPower_Battery_Alkaline.o (+RO);Custom Driver
+        DxInput_Key.o (+RO)         ;Custom Driver
+        DxOutput_LED.o (+RO)        ;Custom Driver
+        FetchLastMsgTsk.o (+RO)     ;Queue Message
+        SysLEDCB.o (+RO)            ;Project Code
+        SysPowerCB.o (+RO)          ;Project Code
+        SysCharge.o (+RO)           ;Project Code
+        SysPowerSrc.o (+RO)         ;Project Code
+; POWERON_CB_IPLOPEN
+        JpgEnc.o (+RO)              ;Lib
+        JpgDec.o (+RO)              ;Lib
+        JpegHeader.o (+RO)          ;Lib
+        JpgParseHeader.o (+RO)      ;Lib
+        DL_ndk08.o (+RO)            ;Lib
+        DC_Fmt_JPEG_ndk08.o (+RO)   ;Lib
+        IPETransform.o (+RO)        ;Driver
+        DCETransform.o (+RO)        ;Driver ....for call dce_460CompatibleTo450()
+        DxCamera_IPL.o (+RO)        ;Custom Driver
+        DxCamera_Sensor.o (+RO)     ;Custom Driver
+        sen_common.o (+RO)          ;Ext Driver
+        SensorSys_Sony14M_ADDI9004_450.o  (+RO) ;Ext Driver
+        SensorSys_ICX631_VSP6244B_Mars3.o  (+RO) ;Ext Driver
+        SensorSys_ICX631_VSP6244B_Sivaco.o  (+RO) ;Ext Driver
+        SensorSys_ICX631_VSP6244B_Hera.o  (+RO) ;Ext Driver
+        SensorSys_RJ23Y3BC4LT_VSP6244A_Hera.o  (+RO) ;Ext Driver
+        SensorSys_ICX631_VSP6244A_Pear.o  (+RO) ;Ext Driver
+        SensorSys_ICX631_VSP6244A_Peach.o  (+RO) ;Ext Driver
+        SensorSys_RJ23Y3BC4LT_VSP6244A_Ares.o  (+RO) ;Ext Driver
+        tg_ADDI9004_450.o  (+RO)    ;Ext Driver
+        tg_VSP6244B_Mars3.o  (+RO)    ;Ext Driver
+        tg_VSP6244B_Sivaco.o  (+RO)    ;Ext Driver
+        tg_VSP6244B_Hera.o  (+RO)    ;Ext Driver
+        tg_VSP6244A_Hera.o  (+RO)    ;Ext Driver
+        tg_VSP6244B_Pear.o  (+RO)    ;Ext Driver
+        tg_VSP6244A_Peach.o  (+RO)    ;Ext Driver
+        tg_VSP6244A_Ares.o  (+RO)    ;Ext Driver
+        CalibrationInfo.o (+RO)     ;Project Code
+        Cal_Alg.o (+RO)             ;Project Code
+        Cal_Api.o (+RO)             ;Project Code
+        CalibrationAPI.o  (+RO)     ;Project Code
+;        CalSensor.o (+RO)           ;Project Code
+        SensorFP.o (+RO)            ;Project Code
+        SysIPLCB.o (+RO)            ;Project Code
+        DevCtrl_Sensor.o (+RO)      ;Project Code
+;FlashLight
+        GxFlash.o (+RO)             ;Lib
+        DxCamera_Flash.o (+RO)      ;Custom Driver
+        flashlight_Sony14M_ADDI9004_450.o (+RO) ;Ext Driver
+        flashlight_ICX631_VSP6244B_Mars3.o (+RO) ;Ext Driver
+        flashlight_ICX631_VSP6244B_Sivaco.o (+RO) ;Ext Driver
+        flashlight_ICX631_VSP6244B_Hera.o (+RO) ;Ext Driver
+        flashlight_RJ23Y3BC4LT_VSP6244A_Hera.o (+RO) ;Ext Driver
+        flashlight_ICX631_VSP6244A_Pear.o (+RO) ;Ext Driver
+        flashlight_ICX631_VSP6244A_Peach.o (+RO) ;Ext Driver
+        flashlight_RJ23Y3BC4LT_VSP6244A_Ares.o (+RO) ;Ext Driver
+        afdrv_Sony14M_ADDI9004_450.o (+RO)     ;Ext Driver
+        afdrv_ICX631_VSP6244B_Mars3.o (+RO)     ;Ext Driver
+        afdrv_ICX631_VSP6244B_Sivaco.o (+RO)     ;Ext Driver
+        afdrv_ICX631_VSP6244B_Hera.o (+RO)     ;Ext Driver
+        afdrv_J23Y3BC4LT_VSP6244A_Hera.o (+RO)     ;Ext Driver
+        afdrv_ICX631_VSP6244A_Pear.o (+RO)     ;Ext Driver
+        afdrv_ICX631_VSP6244A_Peach.o (+RO)     ;Ext Driver
+        afdrv_J23Y3BC4LT_VSP6244A_Ares.o (+RO)     ;Ext Driver
+; POWERON_CB_STGOPEN   
+        DxStorage_Card.o (+RO)      ;Custom Driver
+        GxStorage_Card.o (+RO)      ;Lib
+        GxStorage_Nand.o (+RO)      ;Lib
+        SysStorageCB.o (+RO)        ;Project Code
+; POWERON_CB_PSTOPEN
+        GxPST.o (+RO)               ;Lib
+        DetPST.o (+RO)              ;Lib
+        PStore.o (+RO)              ;Lib
+        ChangeStorage.o (+RO)       ;Lib
+        SysPSTCB.o (+RO)            ;Project Code
+; POWERON_CB_DISPOPEN
+        CoordinateTrans.o (+RO)     ;Lib
+        GxLCD.o (+RO)               ;Lib
+        GxDisplay2.o (+RO)          ;Lib
+        SysDisplay.o (+RO)          ;Lib
+        DxDisplay_LCD.o (+RO)       ;Custom Driver
+        DxDisplay_TV.o (+RO)        ;Custom Driver
+        Toppoly990000744.o (+RO)    ;Ext Driver
+        WM_F4823V4_7FLWa.o (+RO)    ;Ext Driver
+        GPM1175A0.o (+RO)           ;Ext Driver
+        TM027CDH09.o (+RO)          ;Ext Driver
+        SysDisplayCB.o (+RO)        ;Project Code
+        Demo_Logo.o (+RO)           ;Project Code
+        UIResource2.o (+RO)         ;Project Code
+; POWERON_CB_USBOPEN
+        USB.o (+RO)                 ;Lib    
+        USB_misc.o (+RO)            ;Lib
+        GxUSB.o (+RO)               ;Lib
+        SysUSBCB.o (+RO)            ;Project Code
+; POWERON_CB_LENSOPEN
+        LensAPI.o (+RO)             ;Project Code
+        SysLensCB.o (+RO)           ;Project Code
+        DxCamera_Lens.o (+RO)       ;Custom Driver
+        LensCtrlTsk.o (+RO)         ;Ext Driver
+        LensCtrlTsk2.o (+RO)        ;Ext Driver
+        LensDrv_Common.o (+RO)      ;Ext Driver
+        LensDrv_CAS196.o (+RO)      ;Ext Driver
+        LensDrv_CAS205.o (+RO)      ;Ext Driver
+        LensDrv_CAS215.o (+RO)      ;Ext Driver
+        LensDrv_CAS166.o (+RO)      ;Ext Driver
+        LensDrv_D302.o (+RO)      ;Ext Driver
+        LensDrv_FixedLens.o (+RO)   ;Ext Driver
+        LensMotor_CAT5104.o (+RO)   ;Ext Driver
+        LensMotor_PT5115.o (+RO)   ;Ext Driver
+        LensMotor_G2002.o (+RO)    ;Ext Driver
+        LensMotor_G2008.o (+RO)    ;Ext Driver
+        LensMotor_FixedLens.o (+RO)   ;Ext Driver
+        LensInfo.o (+RO)            ;Project Code
+        DevCtrl_Lens.o (+RO)        ;Project Code
+; POWERON_CB_SOUNDOPEN       
+        PlaySoundAPI.o (+RO)        ;Lib
+        PlaySoundTsk.o (+RO)        ;Lib
+        PlaySoundUtil.o (+RO)       ;Lib
+        GxSound.o (+RO)             ;Lib
+        DxSound_Audio.o (+RO)       ;Custom Driver
+        Audio.o (+RO)               ;Ext Driver
+        ADC450.o (+RO)              ;Ext Driver
+        SysSoundCB.o (+RO)          ;Project Code
+        Demo_Sound2.o (+RO)         ;Project Code
+; App     
+        FileSysTskAPI.o (+RO)       ;App Code ;for pstore will user FilesysPause() and FilesysResume()
+        AppVerInfo.o (+RO)          ;App Code
+        UIInfo.o (+RO)              ;Project Code
+        ProjectInfo.o (+RO)         ;Project Code
+        UIMode.o (+RO)              ;Project Code
+        SysInputCB.o (+RO)          ;Project Code
+        MsdcNvtCb_Photo.o (+RO)     ;Project Code   ;for MsdcNvt_HookImageCb()
+        UIFlowPhoto.o (+RO)         ;Project Code
+        UIFlowMovie.o (+RO)         ;Project Code
+        DevCtrlPhoto.o (+RO)        ;Project Code
+        DevCtrlMovie.o (+RO)        ;Project Code
+    }
+    PART_ONE_RW +0x0
+    {
+; Driver
+        DrvCommon.o            (+RW)
+        ;Interrupt.o            (+RW)
+        NAND.o                 (+RW)
+        nand_host.o            (+RW)
+        NAND_PS.o              (+RW)
+        PLL.o                  (+RW)
+        SDIO.o                 (+RW)
+        SDIOII.o               (+RW)
+        Top.o                  (+RW)
+        Amba.o                 (+RW)
+        DMA.o                  (+RW)
+        ;Cache.o                (+RW)
+        GPIO.o                 (+RW)
+        Pad.o                  (+RW)
+        SIF.o                  (+RW)
+        ;Uart.o                 (+RW)
+        ADC.o                  (+RW)
+        Timer.o                (+RW)
+        RTC.o                  (+RW)
+        PWM.o                  (+RW)
+        Delay.o                (+RW)
+        JPEG.o                 (+RW)
+        jpeg_int.o             (+RW)
+        ide.o                  (+RW)
+        ide_lib.o              (+RW)
+        ide_compat.o           (+RW)
+        ide_osd.o              (+RW)
+        ide_video.o            (+RW)
+        ide_tv.o               (+RW)
+        dai.o                  (+RW)
+        eac.o                  (+RW)
+        Wdt.o                  (+RW)
+        DrvVerInfo.o           (+RW)
+        DrvVerInfo_IPP.o       (+RW)
+        DrvVerInfo_codec.o     (+RW)
+        lz.o                   (+RW);UnCompress function
+        DxCommon.o             (+RW)
+; Project PowerOn CB
+        SysCfg.o (+RW)              ;Project Code
+        SysArch.o (+RW)             ;Project Code
+        SysCB.o (+RW)               ;Project Code
+        SysUtility.o (+RW)          ;Project Code        
+        SysSpeed.o (+RW)            ;Project Code
+        SysMemory.o (+RW)           ;Project Code
+        SysTask.o (+RW)             ;Project Code
+        SysMode.o (+RW)             ;Project Code
+; POWERON_CB_START   
+        TM_Mark.o (+RW)             ;Lib
+        Perf.o (+RW)                ;Lib
+        GxStorage.o (+RW)           ;Lib
+        GxPower.o (+RW)             ;Lib
+        GxKey_p1.o (+RW)            ;Lib
+        GxKey.o  (+RW)              ;Lib
+        GxLED.o (+RW)               ;Lib
+        GxFile_p1.o (+RW)           ;Lib
+        GxTimer_p1.o (+RW)          ;Lib
+        GPIOMapping.o (+RW)         ;Custom Driver
+        VoltageDet.o (+RW)          ;Custom Driver
+        DxPower_Battery.o (+RW)     ;Custom Driver
+        DxPower_Battery_Alkaline.o (+RW)    ;Custom Driver
+        DxInput_Key.o (+RW)         ;Custom Driver
+        DxOutput_LED.o (+RW)        ;Custom Driver
+        FetchLastMsgTsk.o (+RW)     ;Queue Message
+        SysLEDCB.o (+RW)            ;Project Code
+        SysPowerCB.o (+RW)          ;Project Code
+        SysCharge.o (+RW)           ;Project Code
+        SysPowerSrc.o (+RW)         ;Project Code
+; POWERON_CB_IPLOPEN
+        JpgEnc.o (+RW)              ;Lib
+        JpgDec.o (+RW)              ;Lib
+        JpegHeader.o (+RW)          ;Lib
+        JpgParseHeader.o (+RW)      ;Lib
+        DL_ndk08.o (+RW)            ;Lib
+        DC_Fmt_JPEG_ndk08.o (+RW)   ;Lib
+        IPETransform.o (+RW)        ;Driver
+        DCETransform.o (+RW)        ;Driver ....for call dce_460CompatibleTo450()
+        DxCamera_IPL.o (+RW)        ;Custom Driver
+        DxCamera_Sensor.o (+RW)     ;Custom Driver
+        sen_common.o (+RW)          ;Ext Driver
+        SensorSys_Sony14M_ADDI9004_450.o  (+RW) ;Ext Driver
+        SensorSys_ICX631_VSP6244B_Mars3.o  (+RW) ;Ext Driver
+        SensorSys_ICX631_VSP6244B_Sivaco.o  (+RW) ;Ext Driver
+        SensorSys_ICX631_VSP6244B_Hera.o  (+RW) ;Ext Driver
+        SensorSys_RJ23Y3BC4LT_VSP6244A_Hera.o  (+RW) ;Ext Driver
+        SensorSys_ICX631_VSP6244A_Pear.o  (+RW) ;Ext Driver
+        SensorSys_ICX631_VSP6244A_Peach.o  (+RW) ;Ext Driver
+        SensorSys_RJ23Y3BC4LT_VSP6244A_Ares.o  (+RW) ;Ext Driver
+        tg_ADDI9004_450.o  (+RW)    ;Ext Driver
+        tg_VSP6244B_Mars3.o  (+RW)    ;Ext Driver
+        tg_VSP6244B_Sivaco.o  (+RW)    ;Ext Driver
+        tg_VSP6244B_Hera.o  (+RW)    ;Ext Driver
+        tg_VSP6244A_Hera.o  (+RW)    ;Ext Driver
+        tg_VSP6244B_Pear.o  (+RW)    ;Ext Driver
+        tg_VSP6244A_Peach.o  (+RW)    ;Ext Driver
+        tg_VSP6244A_Ares.o  (+RW)    ;Ext Driver
+        CalibrationInfo.o (+RW)     ;Project Code
+        Cal_Alg.o (+RW)             ;Project Code
+        Cal_Api.o (+RW)             ;Project Code
+        CalibrationAPI.o  (+RW)     ;Project Code
+;        CalSensor.o (+RW)           ;Project Code
+        SensorFP.o (+RW)            ;Project Code
+        SysIPLCB.o (+RW)            ;Project Code
+        DevCtrl_Sensor.o (+RW)      ;Project Code
+;FlashLight
+        GxFlash.o (+RW)             ;Lib
+        DxCamera_Flash.o (+RW)      ;Custom Driver
+        flashlight_Sony14M_ADDI9004_450.o (+RW) ;Ext Driver
+        flashlight_ICX631_VSP6244B_Mars3.o (+RW) ;Ext Driver
+        flashlight_ICX631_VSP6244B_Sivaco.o (+RW) ;Ext Driver
+        flashlight_ICX631_VSP6244B_Hera.o (+RW) ;Ext Driver
+        flashlight_RJ23Y3BC4LT_VSP6244A_Hera.o (+RW) ;Ext Driver
+        flashlight_ICX631_VSP6244A_Pear.o (+RW) ;Ext Driver
+        flashlight_ICX631_VSP6244A_Peach.o (+RW) ;Ext Driver
+        flashlight_RJ23Y3BC4LT_VSP6244A_Ares.o (+RW) ;Ext Driver
+        afdrv_Sony14M_ADDI9004_450.o (+RW) ;Ext Driver
+        afdrv_ICX631_VSP6244B_Mars3.o (+RW) ;Ext Driver
+        afdrv_ICX631_VSP6244B_Sivaco.o (+RW) ;Ext Driver
+        afdrv_ICX631_VSP6244B_Hera.o (+RW) ;Ext Driver
+        afdrv_RJ23Y3BC4LT_VSP6244A_Hera.o (+RW) ;Ext Driver
+        afdrv_ICX631_VSP6244A_Pear.o (+RW) ;Ext Driver
+        afdrv_ICX631_VSP6244A_Peach.o (+RW) ;Ext Driver
+        afdrv_RJ23Y3BC4LT_VSP6244A_Ares.o (+RW) ;Ext Driver
+; POWERON_CB_STGOPEN   
+        DxStorage_Card.o (+RW)      ;Custom Driver
+        GxStorage_Card.o (+RW)      ;Lib
+        GxStorage_Nand.o (+RW)      ;Lib
+        SysStorageCB.o (+RW)        ;Project Code
+; POWERON_CB_PSTOPEN
+;        GxPST.o (+RW)              ;Lib
+        DetPST.o (+RW)              ;Lib
+        PStore.o (+RW)              ;Lib
+        ChangeStorage.o (+RW)
+        SysPSTCB.o (+RW)            ;Project Code
+; POWERON_CB_DISPOPEN
+        CoordinateTrans.o (+RW)     ;Lib
+        GxLCD.o (+RW)               ;Lib
+        GxDisplay2.o (+RW)          ;Lib
+        SysDisplay.o (+RW)          ;Lib
+        DxDisplay_LCD.o (+RW)       ;Custom Driver
+        DxDisplay_TV.o (+RW)        ;Custom Driver
+        Toppoly990000744.o (+RW)    ;Ext Driver
+        WM_F4823V4_7FLWa.o (+RW)    ;Ext Driver
+        GPM1175A0.o (+RW)           ;Ext Driver
+        TM027CDH09.o (+RW)          ;Ext Driver
+        SysDisplayCB.o (+RW)        ;Project Code
+        Demo_Logo.o (+RW)           ;Project Code
+        UIResource2.o (+RW)         ;Project Code
+; POWERON_CB_USBOPEN
+        USB.o (+RW)                 ;Lib    
+        USB_misc.o (+RW)            ;Lib
+        GxUSB.o (+RW)               ;Lib
+        SysUSBCB.o (+RW)            ;Project Code
+; POWERON_CB_LENSOPEN
+        LensAPI.o (+RW)             ;Project Code
+        SysLensCB.o (+RW)           ;Project Code
+        DxCamera_Lens.o (+RW)       ;Custom Driver
+        LensCtrlTsk.o (+RW)         ;Ext Driver
+        LensCtrlTsk2.o (+RW)        ;Ext Driver
+        LensDrv_CAS196.o (+RW)      ;Ext Driver
+        LensDrv_CAS205.o (+RW)      ;Ext Driver
+        LensDrv_D302.o (+RW)      ;Ext Driver
+        LensDrv_CAS215.o (+RW)      ;Ext Driver
+        LensDrv_CAS166.o (+RW)      ;Ext Driver
+        LensDrv_FixedLens.o (+RW)   ;Ext Driver
+        LensMotor_CAT5104.o (+RW)   ;Ext Driver
+        LensMotor_PT5115.o (+RW)   ;Ext Driver
+        LensMotor_G2002.o (+RW)   ;Ext Driver
+        LensMotor_G2008.o (+RW)   ;Ext Driver
+        LensMotor_FixedLens.o (+RW)   ;Ext Driver
+        LensInfo.o (+RW)            ;Project Code
+        DevCtrl_Lens.o (+RW)        ;Project Code
+; POWERON_CB_SOUNDOPEN       
+        PlaySoundAPI.o (+RW)        ;Lib
+        PlaySoundTsk.o (+RW)        ;Lib
+        PlaySoundUtil.o (+RW)       ;Lib
+        GxSound.o (+RW)             ;Lib
+        DxSound_Audio.o (+RW)       ;Custom Driver
+        Audio.o (+RW)               ;Ext Driver
+        ADC450.o (+RW)              ;Ext Driver
+        SysSoundCB.o (+RW)          ;Project Code
+        Demo_Sound2.o (+RW)         ;Project Code
+; App     
+        FileSysTskAPI.o (+RW)       ;App Code
+        AppVerInfo.o (+RW)          ;App Code
+        UIInfo.o (+RW)              ;Project Code
+        ProjectInfo.o (+RW)         ;Project Code
+        UIMode.o (+RW)              ;Project Code
+        SysInputCB.o (+RW)          ;Project Code
+        MsdcNvtCb_Photo.o (+RW)     ;Project Code   ;for MsdcNvt_HookImageCb()
+        UIFlowPhoto.o (+RW)         ;Project Code
+        UIFlowMovie.o (+RW)         ;Project Code
+        DevCtrlPhoto.o (+RW)        ;Project Code
+        DevCtrlMovie.o (+RW)        ;Project Code
+    }
+
+    ; Part two is the logo / sound and AP used when power on
+    PART_TWO_RO +0x0
+    {
+;AppExt
+        UIEventDispatch.o (+RO)    
+;PhotoApp
+        cap_common.o (+RO)
+        ImgEncTsk.o (+RO)           ;App Code
+        ImgProc2Tsk.o (+RO)         ;App Code
+        ImgCaptureAPI.o (+RO)       ;App Code
+        ImgCapNormal.o (+RO)        ;App Code
+        ImgCapTsk.o(+RO)            ;App Code
+        ImgProcTsk.o (+RO)          ;App Code
+        ImgCapEvent.o(+RO)          ;App Code
+        ImgCapEventInt.o (+RO)      ;App Code
+        PhotoTsk.o (+RO)            ;App Code
+        PhotoDisplayTsk.o (+RO)     ;App Code
+        PhotoDisTsk.o (+RO)         ;App Code
+        AFTsk.o (+RO)               ;App Code
+        AF_ALG.o (+RO)              ;LIB Code
+        DeviceCtrl.o (+RO)          ;Project Code
+        UIPhotoMapping.o (+RO)      ;Project Code
+        UIPhotoObj.o (+RO)          ;Project Code
+        UIAppPhoto_Exe.o (+RO)      ;Project Code
+        UIAppPhoto_CB.o (+RO)       ;Project Code
+;WAV
+        WavStudioAPI.o (+RO)        ;Lib
+        WAVWriter.o (+RO)           ;Lib
+        WavStudioTsk.o (+RO)        ;Lib
+        ADPCM.o (+RO)               ;Lib
+;Driver
+        SIE.o (+RO)
+        sie_api.o (+RO)
+        sie_Transform.o (+RO)
+        IPE.o (+RO)
+        PRE.o (+RO)
+        pre_api.o (+RO)
+        pre_Transform.o (+RO)
+        IME.o (+RO)
+        dis.o (+RO)
+        dis_api.o (+RO)
+        fde.o (+RO)
+        fd_lib.o (+RO)
+        ;IPETransform.o (+RO)  ;for call ipe_460CompatibleTo450()
+        ife.o         (+RO)
+        IFETransform.o (+RO)
+        dce.o         (+RO)
+        ;DCETransform.o (+RO)  ;for call dce_460CompatibleTo450()
+;Common
+        GeoDistortion.o (+RO)
+        IPPBuffer.o (+RO)
+        IPPManager.o (+RO)
+        PanCap_lib.o (+RO)
+        ImageAlgInfor.o (+RO)
+        Alg_IPLMode.o (+RO)
+        aaa_lib.o (+RO)
+        prv_common.o (+RO)
+        sd_lib.o (+RO)
+        asc_lib.o (+RO)
+        bd_lib.o (+RO)
+        caf_lib.o (+RO)
+        ST_lib.o  (+RO)
+        ASOT.o (+RO)        
+        sen_cmd.o (+RO)
+        TempCommon.o (+RO)
+        IQSetting_Sony14M_ADDI9004_450.o (+RO)
+        IQSetting_ICX631_VSP6244B_Mars3.o (+RO)
+        IQSetting_ICX631_VSP6244B_Sivaco.o (+RO)
+        IQSetting_ICX631_VSP6244B_Hera.o (+RO)
+        IQSetting_RJ23Y3BC4LT_VSP6244A_Hera.o (+RO)
+        IQSetting_ICX631_VSP6244A_Pear.o (+RO)
+        IQSetting_ICX631_VSP6244A_Peach.o (+RO)
+        IQSetting_RJ23Y3BC4LT_VSP6244A_Ares.o (+RO)
+        isr_Sony14M_ADDI9004_450.o (+RO)
+        isr_ICX631_VSP6244B_Mars3.o (+RO)
+        isr_ICX631_VSP6244B_Sivaco.o (+RO)
+        isr_ICX631_VSP6244B_Hera.o (+RO)
+        isr_RJ23Y3BC4LT_VSP6244A_Hera.o (+RO)
+        isr_ICX631_VSP6244A_Pear.o (+RO)
+        isr_ICX631_VSP6244A_Peach.o (+RO)
+        isr_RJ23Y3BC4LT_VSP6244A_Ares.o (+RO)
+;        Temp_Sony14M_ADDI9004_450.o (+RO)
+;        Temp_ICX631_VSP6244B_Mars3.o (+RO)
+;        Temp_ICX631_VSP6244B_Sivaco.o (+RO)
+        SensorFlowFunc_Sony14M_ADDI9004_450.o (+RO)
+        SensorFlowFunc_ICX631_VSP6244B_Mars3.o (+RO)
+        SensorFlowFunc_ICX631_VSP6244B_Sivaco.o (+RO)
+        SensorFlowFunc_ICX631_VSP6244B_Hera.o (+RO)
+        SensorFlowFunc_RJ23Y3BC4LT_VSP6244A_Hera.o (+RO)
+        SensorFlowFunc_ICX631_VSP6244A_Pear.o (+RO)
+        SensorFlowFunc_ICX631_VSP6244A_Peach.o (+RO)
+        SensorFlowFunc_RJ23Y3BC4LT_VSP6244A_Ares.o (+RO)
+        ImageEffect.o (+RO)
+        ImgBorder.o (+RO)
+        BorderFrame.o (+RO)
+	smearReduc.o (+RO)
+;AE & AWB
+        ae_api_ext.o (+RO)
+        ae_Sony14M_ADDI9004_450.o (+RO)
+        ae_ICX631_VSP6244B_Mars3.o (+RO)
+        ae_ICX631_VSP6244B_Sivaco.o (+RO)
+        ae_ICX631_VSP6244B_Hera.o (+RO)
+        ae_RJ23Y3BC4LT_VSP6244A_Hera.o (+RO)
+        ae_ICX631_VSP6244A_Pear.o (+RO)
+        ae_ICX631_VSP6244A_Peach.o (+RO)
+        ae_RJ23Y3BC4LT_VSP6244A_Ares.o (+RO)
+        awb_api_ext.o (+RO)
+        awb_Sony14M_ADDI9004_450.o (+RO)
+        awb_ICX631_VSP6244B_Mars3.o (+RO)
+        awb_ICX631_VSP6244B_Sivaco.o (+RO)
+        awb_ICX631_VSP6244B_Hera.o (+RO)
+        awb_RJ23Y3BC4LT_VSP6244A_Hera.o (+RO)
+        awb_ICX631_VSP6244A_Pear.o (+RO)
+        awb_ICX631_VSP6244A_Peach.o (+RO)
+        awb_RJ23Y3BC4LT_VSP6244A_Ares.o (+RO)
+        EXT_AeTable.o (+RO)
+        EXT_color_api.o (+RO)
+        EXT_Vars.o (+RO)
+;AE & AWB for NVT
+        ae_api_nvt.o (+RO)
+        awb_api_nvt.o (+RO)
+        ae_alg_converge.o (+RO)
+        ae_alg_flow.o (+RO)
+        ae_alg_measure.o (+RO)
+        ae_alg_table.o (+RO)
+        awb_alg_flow.o (+RO)
+        awb_alg_table.o (+RO)
+;ExtAeAwb.a
+        awb_alg.o (+RO)
+        ae_alg.o (+RO)
+        af_api.o (+RO)
+        AO_aaa.o (+RO)
+        AO_aaactrl.o (+RO)
+        AO_camInfo.o (+RO)
+        AO_params.o (+RO)
+        AO_strobe.o (+RO)
+        AO_afe.o (+RO)
+        AO_rAab2aWvLib.o (+RO)
+        AO_ae.o (+RO)
+;DZoom
+        dzoom_Sony14M_ADDI9004_450.o (+RO)
+        dzoom_ICX631_VSP6244B_Mars3.o (+RO)
+        dzoom_ICX631_VSP6244B_Sivaco.o (+RO)
+        dzoom_ICX631_VSP6244B_Hera.o (+RO)
+        dzoom_RJ23Y3BC4LT_VSP6244A_Hera.o (+RO)
+        dzoom_ICX631_VSP6244A_Pear.o (+RO)
+        dzoom_ICX631_VSP6244A_Peach.o (+RO)
+        dzoom_RJ23Y3BC4LT_VSP6244A_Ares.o (+RO)
+;FD
+        FDcommon.o (+RO)
+;        fd_Sony14M_ADDI9004_450.o (+RO)
+;        fd_ICX631_VSP6244B_Mars3.o (+RO)
+;        fd_ICX631_VSP6244B_Sivaco.o (+RO)
+;DIS
+        dis_common.o (+RO)
+;HDR
+        Prv_PostProcessing.o (+RO)
+    }
+
+    PART_TWO_RW +0x0
+    {
+;AppExt
+        UIEventDispatch.o (+RW)     
+;PhotoApp
+        cap_common.o (+RW)
+        ImgEncTsk.o (+RW)           ;App Code
+        ImgProc2Tsk.o (+RW)         ;App Code
+        ImgCaptureAPI.o (+RW)       ;App Code
+        ImgCapNormal.o(+RW)         ;App Code
+        ImgCapTsk.o(+RW)            ;App Code
+        ImgProcTsk.o (+RW)          ;App Code
+        ImgCapEvent.o(+RW)          ;App Code
+        ImgCapEventInt.o (+RW)      ;App Code
+        PhotoTsk.o (+RW)            ;App Code
+        PhotoDisplayTsk.o (+RW)     ;App Code
+        PhotoDisTsk.o (+RW)         ;App Code
+        AFTsk.o (+RW)               ;App Code        
+        AF_ALG.o (+RW)              ;LIB Code        
+        DeviceCtrl.o (+RW)          ;Project Code
+        UIPhotoMapping.o (+RW)      ;Project Code
+        UIPhotoObj.o (+RW)          ;Project Code
+        UIAppPhoto_Exe.o (+RW)      ;Project Code
+        UIAppPhoto_CB.o (+RW)       ;Project Code
+;WAV
+        WavStudioAPI.o (+RW)        ;Lib
+        WAVWriter.o (+RW)           ;Lib
+        WavStudioTsk.o (+RW)        ;Lib
+        ADPCM.o (+RW)               ;Lib
+;Driver
+        SIE.o (+RW)
+        sie_api.o (+RW)
+        sie_Transform.o (+RW)
+        IPE.o (+RW)        
+        PRE.o (+RW)
+        pre_api.o (+RW)
+        pre_Transform.o (+RW)
+        IME.o (+RW)
+        dis.o (+RW)
+        dis_api.o (+RW)
+        fde.o (+RW)
+        ;IPETransform.o (+RW)  ;for call ipe_460CompatibleTo450()
+        ife.o         (+RW)
+        IFETransform.o (+RW)
+        dce.o         (+RW)
+        ;DCETransform.o (+RW)  ;for call dce_460CompatibleTo450()
+;Common
+        fd_lib.o (+RW)
+        GeoDistortion.o (+RW)
+        IPPBuffer.o (+RW)
+        IPPManager.o (+RW)
+        PanCap_lib.o (+RW)
+        ImageAlgInfor.o (+RW)
+        Alg_IPLMode.o (+RW)
+        aaa_lib.o (+RW)
+        prv_common.o (+RW)
+        sd_lib.o (+RW)
+        asc_lib.o (+RW)
+        bd_lib.o (+RW)
+        caf_lib.o (+RW)
+        ST_lib.o  (+RW)       
+        ASOT.o (+RW)        
+        sen_cmd.o (+RW)
+        TempCommon.o (+RW)
+        IQSetting_Sony14M_ADDI9004_450.o (+RW)
+        IQSetting_ICX631_VSP6244B_Mars3.o (+RW)
+        IQSetting_ICX631_VSP6244B_Sivaco.o (+RW)
+        IQSetting_ICX631_VSP6244B_Hera.o (+RW)
+        IQSetting_RJ23Y3BC4LT_VSP6244A_Hera.o (+RW)
+        IQSetting_ICX631_VSP6244A_Pear.o (+RW)
+        IQSetting_ICX631_VSP6244A_Peach.o (+RW)
+        IQSetting_RJ23Y3BC4LT_VSP6244A_Ares.o (+RW)
+        isr_Sony14M_ADDI9004_450.o (+RW)
+        isr_ICX631_VSP6244B_Mars3.o (+RW)
+        isr_ICX631_VSP6244B_Sivaco.o (+RW)
+        isr_ICX631_VSP6244B_Hera.o (+RW)
+        isr_RJ23Y3BC4LT_VSP6244A_Hera.o (+RW)
+        isr_ICX631_VSP6244A_Pear.o (+RW)
+        isr_ICX631_VSP6244A_Peach.o (+RW)
+        isr_RJ23Y3BC4LT_VSP6244A_Ares.o (+RW)
+;        Temp_Sony14M_ADDI9004_450.o (+RW)
+;        Temp_ICX631_VSP6244B_Mars3.o (+RW)
+;        Temp_ICX631_VSP6244B_Sivaco.o (+RW)
+        SensorFlowFunc_Sony14M_ADDI9004_450.o (+RW)
+        SensorFlowFunc_ICX631_VSP6244B_Mars3.o (+RW)
+        SensorFlowFunc_ICX631_VSP6244B_Sivaco.o (+RW)
+        SensorFlowFunc_ICX631_VSP6244B_Hera.o (+RW)
+        SensorFlowFunc_RJ23Y3BC4LT_VSP6244A_Hera.o (+RW)
+        SensorFlowFunc_ICX631_VSP6244A_Pear.o (+RW)
+        SensorFlowFunc_ICX631_VSP6244A_Peach.o (+RW)
+        SensorFlowFunc_RJ23Y3BC4LT_VSP6244A_Ares.o (+RW)
+        ImageEffect.o (+RW)
+        ImgBorder.o (+RW)
+        BorderFrame.o (+RW)
+	smearReduc.o (+RW)
+;AE & AWB
+        ae_api_ext.o (+RW)
+        ae_Sony14M_ADDI9004_450.o (+RW)
+        ae_ICX631_VSP6244B_Mars3.o (+RW)
+        ae_ICX631_VSP6244B_Sivaco.o (+RW)
+        ae_ICX631_VSP6244B_Hera.o (+RW)
+        ae_RJ23Y3BC4LT_VSP6244A_Hera.o (+RW)
+        ae_ICX631_VSP6244A_Pear.o (+RW)
+        ae_ICX631_VSP6244A_Peach.o (+RW)
+        ae_RJ23Y3BC4LT_VSP6244A_Ares.o (+RW)
+        awb_api_ext.o (+RW)
+        awb_Sony14M_ADDI9004_450.o (+RW)
+        awb_ICX631_VSP6244B_Mars3.o (+RW)
+        awb_ICX631_VSP6244B_Sivaco.o (+RW)
+        awb_ICX631_VSP6244B_Hera.o (+RW)
+        awb_RJ23Y3BC4LT_VSP6244A_Hera.o (+RW)
+        awb_ICX631_VSP6244A_Pear.o (+RW)
+        awb_ICX631_VSP6244A_Peach.o (+RW)
+        awb_RJ23Y3BC4LT_VSP6244A_Ares.o (+RW)
+        EXT_AeTable.o (+RW)
+        EXT_color_api.o (+RW)
+        EXT_Vars.o (+RW)
+;AE & AWB for NVT
+        ae_api_nvt.o (+RW)
+        awb_api_nvt.o (+RW)
+        ae_alg_converge.o (+RW)
+        ae_alg_flow.o (+RW)
+        ae_alg_measure.o (+RW)
+        ae_alg_table.o (+RW)
+        awb_alg_flow.o (+RW)
+        awb_alg_table.o (+RW)
+;ExtAeAwb.a
+        awb_alg.o (+RW)
+        ae_alg.o (+RW)
+        af_api.o (+RW)
+        AO_aaa.o (+RW)
+        AO_aaactrl.o (+RW)
+        AO_camInfo.o (+RW)
+        AO_params.o (+RW)
+        AO_strobe.o (+RW)
+        AO_afe.o (+RW)
+        AO_rAab2aWvLib.o (+RW)
+        AO_ae.o (+RW)
+;DZoom
+        dzoom_Sony14M_ADDI9004_450.o (+RW)
+        dzoom_ICX631_VSP6244B_Mars3.o (+RW)
+        dzoom_ICX631_VSP6244B_Sivaco.o (+RW)
+        dzoom_ICX631_VSP6244B_Hera.o (+RW)
+        dzoom_RJ23Y3BC4LT_VSP6244A_Hera.o (+RW)
+        dzoom_ICX631_VSP6244A_Pear.o (+RW)
+        dzoom_ICX631_VSP6244A_Peach.o (+RW)
+        dzoom_RJ23Y3BC4LT_VSP6244A_Ares.o (+RW)
+;FD
+        FDcommon.o (+RW)
+;        fd_Sony14M_ADDI9004_450.o (+RW)
+;        fd_ICX631_VSP6244B_Mars3.o (+RW)
+;        fd_ICX631_VSP6244B_Sivaco.o (+RW)
+;DIS
+        dis_common.o (+RW)
+;HDR
+        Prv_PostProcessing.o (+RW)
+    }
+
+    PART_THREE_RO +0x0
+    {
+        *(+RO)
+    }
+
+    PART_THREE_RW +0x0
+    {
+        *(+RW)
+    }
+
+    LOAD_RESET 0x00A00000
+    {
+        UpdateNandReset.o (*)
+    }
+}
+
+LOAD_REGION2 +0x0
+{
+    GENERAL_ZI +0x0
+    {
+        *(+ZI)
+    }
+}

@@ -1,0 +1,6 @@
+---- L_GPIO_12 Matches (5 in 2 files) ----
+Bl_func.c (project\model\src):			gpio_setPin(L_GPIO_12);
+Bl_func.c (project\model\src):			gpio_clearPin(L_GPIO_12);
+Bl_func.c (project\model\src):	gpio_setDir(L_GPIO_12,GPIO_DIR_OUTPUT);// WatchDog 
+Bl_func.c (project\model\src):	gpio_setPin(L_GPIO_12); //disable watchdog in loder //drh 20170826
+GPIO.h (include\driver650):#define L_GPIO_12   (12+L_GPIO_SHIFT_BASE)  ///< LGPIO[12]

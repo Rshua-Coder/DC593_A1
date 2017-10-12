@@ -1,0 +1,217 @@
+#----------------------------------------------------------------------
+# set the basic ASM flags
+#----------------------------------------------------------------------
+PLATFORM_AFLAGS := -march=24kec -mtune=24kec -mdsp -EL -msoft-float
+
+#----------------------------------------------------------------------
+# set the basic C flags
+# Reference
+# http://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/
+# http://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/Option-Summary.html#Option-Summary
+#----------------------------------------------------------------------
+#----------------------------------------------------------------------
+# Overall Options
+#----------------------------------------------------------------------
+# -c    : Compile the source files, but do not link
+# -pipe : Use pipes rather than temporary files for communication between the various stages of compilation
+PLATFORM_CFLAGS := -c -pipe
+
+#----------------------------------------------------------------------
+# Machine Dependent Options
+#----------------------------------------------------------------------
+# -march=24kec  : Generate code that will run on MIPS 24KEc
+# -mtune=24kec  : Optimize for MIPS 24KEc
+# -mdsp         : Use revision 1 of the MIPS DSP ASE
+# -EL           : Generate little-endian code
+# -msoft-float  : Do not use floating-point coprocessor instructions
+# -G0           : *** Need Confirm ***
+#----------------------------------------------------------------------
+PLATFORM_CFLAGS += -march=24kec -mtune=24kec -mdsp -EL -msoft-float -G0
+
+#----------------------------------------------------------------------
+# Warning Options
+#----------------------------------------------------------------------
+# -Wall         : This enables all the warnings about constructions that some users consider questionable,
+#                 and that are easy to avoid (or modify to prevent the warning), even in conjunction with macros.
+#         NOTE: -Wall turns on the following warning flags:
+#         -Waddress
+#         -Warray-bounds (only with -O2)
+#         -Wc++11-compat
+#         -Wchar-subscripts
+#         -Wenum-compare (in C/ObjC; this is on by default in C++)
+#         -Wimplicit-int (C and Objective-C only)
+#         -Wimplicit-function-declaration (C and Objective-C only)
+#         -Wcomment
+#         -Wformat
+#         -Wmain (only for C/ObjC and unless -ffreestanding)
+#         -Wmaybe-uninitialized
+#         -Wmissing-braces (only for C/ObjC)
+#         -Wnonnull
+#         -Wparentheses
+#         -Wpointer-sign
+#         -Wreorder
+#         -Wreturn-type
+#         -Wsequence-point
+#         -Wsign-compare (only in C++)
+#         -Wstrict-aliasing
+#         -Wstrict-overflow=1
+#         -Wswitch
+#         -Wtrigraphs
+#         -Wuninitialized
+#         -Wunknown-pragmas
+#         -Wunused-function
+#         -Wunused-label
+#         -Wunused-value
+#         -Wunused-variable
+#         -Wvolatile-register-var
+# -Wundef               : Warn if an undefined identifier is evaluated in an `#if' directive
+# -Wsign-compare        : Warn when a comparison between signed and unsigned values could produce an incorrect result when the signed value is converted to unsigned
+# -Wno-missing-braces   : Trun off "Warn if an aggregate or union initializer is not fully bracketed". For XXX = {0}; statement.
+# -Wstrict-prototypes   : Warn if a function is declared or defined without specifying the argument types
+# -Wimplicit-function-declaration   : Warn when a function is used before being declared
+# -Wmissing-prototypes  : Warn about global funcs without prototypes
+# -Wmissing-declarations: Warn about global funcs without previous declarations
+#----------------------------------------------------------------------
+PLATFORM_CFLAGS += -Wall -Wundef -Wsign-compare -Wno-missing-braces -Wstrict-prototypes
+ifeq "$(OUTPUT_FILE)" "BIN"
+else
+ifeq "$(INCLUDE_RULE)" "ON"
+#    PLATFORM_CFLAGS += -Werror=implicit-function-declaration -Werror=missing-prototypes -Werror=missing-declarations
+    PLATFORM_CFLAGS += -Wimplicit-function-declaration -Wmissing-prototypes -Wmissing-declarations
+endif
+endif
+
+#----------------------------------------------------------------------
+# C Language Options
+#----------------------------------------------------------------------
+# -fno-builtin  : Don't recognize built-in functions that do not begin with `__builtin_' as prefix
+# -ffreestanding: Assert that compilation takes place in a freestanding environment
+#----------------------------------------------------------------------
+# Code Generation Options
+#----------------------------------------------------------------------
+# -fno-common   : The compiler should place uninitialized global variables in the data section of the object file, rather than generating them as common blocks
+# -fshort-wchar : Override the underlying type for `wchar_t' to be `short unsigned int' instead of the default for the target.
+#----------------------------------------------------------------------
+# Optimization Options
+#----------------------------------------------------------------------
+# -fno-strict-aliasing          : Do not warn about code that breaks strict aliasing rules
+# -fno-optimize-sibling-calls   : Don't optimize sibling and tail recursive calls
+# -fno-omit-frame-pointer       : Keep the frame pointer in a register for functions that don't need one
+#----------------------------------------------------------------------
+PLATFORM_CFLAGS += -fno-builtin -ffreestanding -fno-common -fshort-wchar -fno-strict-aliasing -fno-optimize-sibling-calls -fno-omit-frame-pointer
+
+# C Language Options for eCos system
+ifeq "$(USE_ECOS_KERNEL)" "ON"
+    PLATFORM_CFLAGS += -D__ECOS
+else
+    PLATFORM_CFLAGS += -nostdinc
+endif
+
+# Remove -Otime (There is no such option in GCC, GCC default is optimize for time)
+# Replace -OSpace (-Os in GCC)
+CFLAGS_D := $(filter-out -Otime, $(CFLAGS_D))
+CFLAGS_D := $(CFLAGS_D:-Ospace=-Os)
+CFLAGS_R := $(filter-out -Otime, $(CFLAGS_R))
+CFLAGS_R := $(CFLAGS_R:-Ospace=-Os)
+
+# Slove sub-folder cannot include parent folder header file
+INC_DIR += -I$(CURDIR)
+
+# For Debug target
+CFLAGS_D    += $(INC_DIR) -g -ggdb -O0 $(PLATFORM_CFLAGS)
+ASMFLAGS_D  += -g $(INC_DIR) $(PLATFORM_AFLAGS)
+
+# For Release target
+CFLAGS_R    += $(INC_DIR) -O2 $(PLATFORM_CFLAGS)
+ASMFLAGS_R  += $(INC_DIR) $(PLATFORM_AFLAGS)
+
+# Generate debug symbol in release target
+ifeq "$(RELEASE_SYMBOL)" "ON"
+    CFLAGS_R    += -g -ggdb
+    ASMFLAGS_R  += -L -g
+endif
+
+# Generate debug callback of entry and exit to functions
+ifeq "$(INSTRUMENT_FUNCTION)" "ON"
+    CFLAGS_R += -finstrument-functions -finstrument-functions-exclude-file-list=Common_src/LibC,Common_src/Kernel,Common_src/Debug,Common_src/OS,Include/Common/LibC,Include/Common/Kernel,Include/Common/Debug,Include/Common/OS,Drv_src/Driver,Include/Drv/Driver
+    CFLAGS_D += -finstrument-functions -finstrument-functions-exclude-file-list=Common_src/LibC,Common_src/Kernel,Common_src/Debug,Common_src/OS,Include/Common/LibC,Include/Common/Kernel,Include/Common/Debug,Include/Common/OS,Drv_src/Driver,Include/Drv/Driver
+    CFLAGS_R += -D_INSTRUMENT_FUNCTION_=1
+    CFLAGS_D += -D_INSTRUMENT_FUNCTION_=1
+else
+    CFLAGS_R += -D_INSTRUMENT_FUNCTION_=0
+    CFLAGS_D += -D_INSTRUMENT_FUNCTION_=0
+endif
+
+#----------------------------------------------------------------------
+# Generate one ELF section for each function
+# Only apply to release target
+#----------------------------------------------------------------------
+ifeq "$(SECTION_BY_FUNC)" "ON"
+    CFLAGS_R += -ffunction-sections -fdata-sections
+endif
+
+# for dependency creating
+GCCFLAGS += $(INC_DIR) -c -w
+
+#----------------------------------------------------------------------
+# compile rule functions
+#----------------------------------------------------------------------
+ifeq "$(ISOLATE_DEP)" "ON"
+
+    # $(call compile_rule,object,source,cflags)
+    define compile_rule
+    $1: $2
+		@echo Compiling $(notdir $2) \
+		&& $(CC) -D__section_name__=$(PRJ_NAME) -D__module_name__=$(PRJ_NAME)_LIBRARY_VERSION_INFO -D__SHORT_FILE__=$(basename $(notdir $2)) $3 -o $1 $2 $$(LOG_OPTION)
+
+    endef
+
+    # $(call compile_rule_asm,object,source,asmflags)
+    define compile_rule_asm
+    $1: $2
+		@echo Assembling $(notdir $2) \
+		&& $(AS) $3 -o $1 $2 $$(LOG_OPTION)
+
+    endef
+
+else
+
+    # $(call compile_rule,object,source,cflags)
+    define compile_rule
+    $1: $2
+		@-$(GCC) -MM -MF $(basename $1).d -MP -MT $1 $(GCCFLAGS) $2 \
+		&& echo Compiling $(notdir $2)
+		@$(CC) -D__section_name__=$(PRJ_NAME) -D__module_name__=$(PRJ_NAME)_LIBRARY_VERSION_INFO -D__SHORT_FILE__=$(basename $(notdir $2)) $3 -o $1 $2 $$(LOG_OPTION)
+
+    endef
+
+    # $(call compile_rule_asm,object,source,asmflags)
+    define compile_rule_asm
+    $1: $2
+		@echo Assembling $(notdir $2) \
+		&& $(AS) $(ASMFLAGS_R) $2 --MD $(basename $1).d -o $(basename $1).o
+
+    endef
+
+endif
+
+#-----------------------------------------------------------------
+# dependency rule functions
+#-----------------------------------------------------------------
+# $(call depend_rule,depend,source)
+define depend_rule
+$1: $2
+	@echo Depending $(notdir $2) \
+	&& $(GCC) -MM -MF $1 -MP -MT $(basename $1).o $(GCCFLAGS) $2 \
+	&& sed -e 's/_Data\/Debug\//_Data\/Release\//1' $1 > $(subst _Data/Debug/,_Data/Release/,$1)
+
+endef
+
+define depend_rule_asm
+$1: $2
+	@echo Depending $(notdir $2) \
+	&& $(AS) $(ASMFLAGS_R) $2 --MD $1 -o $(basename $1).o \
+	&& sed -e 's/_Data\/Debug\//_Data\/Release\//1' $1 > $(subst _Data/Debug/,_Data/Release/,$1) \
+	&& rm -f $(basename $1).o
+
+endef
