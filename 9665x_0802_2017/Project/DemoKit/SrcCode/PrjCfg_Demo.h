@@ -17,6 +17,7 @@
 #define FW_UPDATE_NAME                  "A:\\FW96655A.bin"
 #ifndef __ECOS
 #define FW_VERSION_RELEASE              DISABLE //ENABLE
+//#define FW_VERSION_NUM                  "GSDEMO_0001_0027"
 #define FW_VERSION_NUM                  "SYA1_20171012"
 #else
 #define FW_VERSION_RELEASE              DISABLE
